@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, \
-    QWidget, QLineEdit
+    QWidget, QLineEdit, QHeaderView
 
 class UserWindow(QMainWindow):
     def __init__(self):

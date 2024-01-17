@@ -4,13 +4,15 @@ import psycopg2
 from psycopg2 import sql
 import PostgreSQLConnection
 import UserWindow
+import UserInfoWindow
 
 class Application():
 
     def __init__(self):
-
+        self.userinfobox = None
         self.userWindow = UserWindow.UserWindow()
         self.userWindow.searchbox.textChanged.connect(self.update_results)
+        self.userWindow.table_widget.cellClicked.connect(self.create_infobox)
         self.postgres_connection = PostgreSQLConnection.PostgreSQLConnection(
             user="Javascript",
             password="javascript",
@@ -34,6 +36,30 @@ class Application():
         self.update_dropdown_kraje()
         self.update_dropdown_powiaty()
         self.update_results()
+
+    def create_infobox(self, row, column):
+
+        name = self.userWindow.table_widget.item(row,0).text()
+
+
+
+        options_query = '''SELECT pokazpodleglemiejscowosci('{}')'''.format(name)
+
+        options_columns, options_result = self.run_query(options_query)
+        res = []
+        population = 0
+        print(options_result)
+        for i in options_result:
+            res.append((i[0].split(',')[1], i[0].split(',')[2], (str(i[0].split(',')[3]) + " " + str(i[0].split(',')[4])).replace("\"", "").replace("(","").replace(")","")))
+            population += int(i[0].split(',')[2])
+
+        self.userinfobox = UserInfoWindow.UserInfoWindow(name, population, res)
+
+
+
+
+
+
 
     def run_query(self, query):
         select_data_query = sql.SQL(query)
