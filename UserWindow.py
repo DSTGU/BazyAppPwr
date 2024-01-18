@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidge
 
 from PyQt5.QtCore import QEventLoop, pyqtSlot, pyqtSignal
 
+from PyQt5.QtGui import QIcon
+
 import LoginWindow
 
 class UserWindow(QMainWindow):
@@ -87,15 +89,18 @@ class UserWindow(QMainWindow):
         dodajKrajButton = QPushButton(self)
         dodajKrajButton.setIcon(self.style().standardIcon(QStyle.SP_DialogApplyButton))
         krajeHBox.addWidget(dodajKrajButton)
+        dodajKrajButton.clicked.connect(self.showDodajKrajWindow)
 
         usunKrajButton = QPushButton(self)
         usunKrajButton.setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
         krajeHBox.addWidget(usunKrajButton)
+        usunKrajButton.clicked.connect(self.usunKraj)
 
         edytujKrajButton = QPushButton(self)
         edytujKrajButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
         krajeHBox.addWidget(edytujKrajButton)
         self.top_layout.addRow(krajeHBox)
+        edytujKrajButton.clicked.connect(self.showEdytujKrajWindow)
 
 
         powiatyHBox = QHBoxLayout(self)
@@ -110,19 +115,24 @@ class UserWindow(QMainWindow):
         dodajPowiatButton = QPushButton(self)
         dodajPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_DialogApplyButton))
         powiatyHBox.addWidget(dodajPowiatButton)
+        dodajPowiatButton.clicked.connect(self.showDodajPowiatWindow)
 
         usunPowiatButton = QPushButton(self)
         usunPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
         powiatyHBox.addWidget(usunPowiatButton)
+        usunPowiatButton.clicked.connect(self.usunPowiat)
 
         edytujPowiatButton = QPushButton(self)
         edytujPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
         powiatyHBox.addWidget(edytujPowiatButton)
+        edytujPowiatButton.clicked.connect(self.showEdytujPowiatWindow)
+
         self.top_layout.addRow(powiatyHBox)
 
         dodajGmineButton = QPushButton(self)
         dodajGmineButton.setIcon(self.style().standardIcon(QStyle.SP_DialogApplyButton))
         dodajGmineButton.setText("Dodaj Gminę")
+        dodajGmineButton.clicked.connect(self.showDodajGmineWindow)
         self.top_layout.addRow(dodajGmineButton)
 
 
@@ -144,6 +154,24 @@ class UserWindow(QMainWindow):
         loop = QEventLoop()
         self.loginWindow.destroyed.connect(loop.quit)
         loop.exec()
+
+    def showDodajGmineWindow(self):
+        print("1")
+    def showDodajKrajWindow(self):
+        print("2")
+    def showDodajPowiatWindow(self):
+        print("3")
+    def usunGmine(self):
+        print("4")
+    def usunPowiat(self):
+        print("5")
+    def usunKraj(self):
+        print("6")
+    def showEdytujPowiatWindow(self):
+        print("7")
+    def showEdytujKrajWindow(self):
+        print("8")
+
 
     def passup(self, username, token):
         print("Passed one")
