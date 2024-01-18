@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, QWidget, \
-    QLineEdit
+    QLineEdit, QStyle
 from PyQt5.QtCore import QEventLoop, pyqtSignal
 import psycopg2
 from psycopg2 import sql
@@ -27,8 +27,9 @@ class Application():
         self.userWindow = UserWindow.UserWindow(None, None, self.postgres_connection)
         self.userWindow.loginPassup.connect(self.update_window)
         self.userWindow.searchbox.textChanged.connect(self.update_results)
-        self.userWindow.table_widget.cellClicked.connect(self.create_infobox)
+        self.userWindow.table_widget.cellClicked.connect(self.cell_click_action)
         # self.userWindow.loginPass.connect(self.update_login)
+        self.admin = 0
 
         self.show_database()
 
@@ -55,6 +56,13 @@ class Application():
         columns, result = self.postgres_connection.execute_query(select_data_query)
         return (columns, result)
 
+    def cell_click_action(self, row, column):
+        print(column)
+        if column <= 2:
+            self.create_infobox(row,column)
+            # TODO: else usun gmine
+
+
     def create_infobox(self, row, column):
 
         name = self.userWindow.table_widget.item(row, 0).text()
@@ -64,7 +72,7 @@ class Application():
         options_columns, options_result = self.run_query(options_query)
         res = []
         population = 0
-        print(options_result)
+        #print(options_result)
         for i in options_result:
             res.append((i[0].split(',')[1], i[0].split(',')[2],
                         (str(i[0].split(',')[3]) + " " + str(i[0].split(',')[4])).replace("\"", "").replace("(",
@@ -81,13 +89,28 @@ class Application():
 
         self.userWindow.table_widget.clear()
         self.userWindow.table_widget.setRowCount(0)
-        self.userWindow.table_widget.setColumnCount(len(self.columns))
-        self.userWindow.table_widget.setHorizontalHeaderLabels(self.columns)
-        for row_index, row in enumerate(data):
-            self.userWindow.table_widget.insertRow(row_index)
-            for col_index, value in enumerate(row):
-                item = QTableWidgetItem(str(value))
-                self.userWindow.table_widget.setItem(row_index, col_index, item)
+        if (self.admin == 0):
+            self.userWindow.table_widget.setColumnCount(len(self.columns))
+            self.userWindow.table_widget.setHorizontalHeaderLabels(self.columns)
+            for row_index, row in enumerate(data):
+                self.userWindow.table_widget.insertRow(row_index)
+                for col_index, value in enumerate(row):
+                    item = QTableWidgetItem(str(value))
+                    self.userWindow.table_widget.setItem(row_index, col_index, item)
+
+        else:
+            columns = self.columns
+            columns.append("Delete")
+            self.userWindow.table_widget.setColumnCount(len(columns))
+            self.userWindow.table_widget.setHorizontalHeaderLabels(columns)
+            for row_index, row in enumerate(data):
+                self.userWindow.table_widget.insertRow(row_index)
+                for col_index, value in enumerate(row):
+                    item = QTableWidgetItem(str(value))
+                    self.userWindow.table_widget.setItem(row_index, col_index, item)
+                item = QTableWidgetItem("Usun")
+                print("dupa")
+                self.userWindow.table_widget.setItem(row_index, 3, item)
 
     def update_dropdown_kraje(self):
         # Fetch available osptions from the database
@@ -126,6 +149,10 @@ class Application():
         newuserWindow = UserWindow.UserWindow(username, token, self.postgres_connection)
         newuserWindow.show()
         self.userWindow = newuserWindow
+        self.userWindow.loginPassup.connect(self.update_window)
+        self.userWindow.searchbox.textChanged.connect(self.update_results)
+        self.userWindow.table_widget.cellClicked.connect(self.cell_click_action)
+        self.admin = 1
         self.show_database()
 
 

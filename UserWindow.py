@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, \
-    QWidget, QLineEdit, QHeaderView, QPushButton, QFormLayout
+    QWidget, QLineEdit, QHeaderView, QPushButton, QFormLayout, QHBoxLayout, QLabel, QStyle
 
 from PyQt5.QtCore import QEventLoop, pyqtSlot, pyqtSignal
 
@@ -10,8 +10,6 @@ class UserWindow(QMainWindow):
     def __init__(self, username, token, connection):
         self.connection = connection
         super().__init__()
-        print("dupa")
-
 
         self.setWindowTitle("Database GUI Application")
 
@@ -72,21 +70,61 @@ class UserWindow(QMainWindow):
 
     def adminWindowInit(self):
 
-        # Add login window
-        self.loginWindow = None
         # Add the searchbox
         self.searchbox = QLineEdit(self)
         self.top_layout.addRow("Wyszukaj: ", self.searchbox)
 
-        # Create and add a QComboBox
+
+        krajeHBox = QHBoxLayout(self)
+        textK = QLabel(self)
+        textK.setText("Kraj:")
+        krajeHBox.addWidget(textK)
+
         self.dropdown_kraje = QComboBox(self)
-        self.top_layout.addRow("Kraj: ", self.dropdown_kraje)
+        krajeHBox.addWidget(self.dropdown_kraje)
         # central_layout.addWidget(self.dropdown_kraje)
 
+        dodajKrajButton = QPushButton(self)
+        dodajKrajButton.setIcon(self.style().standardIcon(QStyle.SP_DialogApplyButton))
+        krajeHBox.addWidget(dodajKrajButton)
+
+        usunKrajButton = QPushButton(self)
+        usunKrajButton.setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
+        krajeHBox.addWidget(usunKrajButton)
+
+        edytujKrajButton = QPushButton(self)
+        edytujKrajButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
+        krajeHBox.addWidget(edytujKrajButton)
+        self.top_layout.addRow(krajeHBox)
+
+
+        powiatyHBox = QHBoxLayout(self)
+        textP = QLabel(self)
+        textP.setText("Powiaty:")
+        powiatyHBox.addWidget(textP)
         # Create and add a QComboBox
         self.dropdown_powiaty = QComboBox(self)
-        self.top_layout.addRow("Powiat: ", self.dropdown_powiaty)
-        # central_layout.addWidget(self.dropdown_powiaty)
+        powiatyHBox.addWidget(self.dropdown_powiaty)
+        # central_layout.addWidget(self.dropdown_kraje)
+
+        dodajPowiatButton = QPushButton(self)
+        dodajPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_DialogApplyButton))
+        powiatyHBox.addWidget(dodajPowiatButton)
+
+        usunPowiatButton = QPushButton(self)
+        usunPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
+        powiatyHBox.addWidget(usunPowiatButton)
+
+        edytujPowiatButton = QPushButton(self)
+        edytujPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
+        powiatyHBox.addWidget(edytujPowiatButton)
+        self.top_layout.addRow(powiatyHBox)
+
+        dodajGmineButton = QPushButton(self)
+        dodajGmineButton.setIcon(self.style().standardIcon(QStyle.SP_DialogApplyButton))
+        dodajGmineButton.setText("Dodaj Gminę")
+        self.top_layout.addRow(dodajGmineButton)
+
 
         # Add a QTableWidget to the central widget
         self.table_widget = QTableWidget(self)
