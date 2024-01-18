@@ -1,14 +1,19 @@
+import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QLabel, QWidget, QHeaderView, QPushButton
 from PyQt5.QtCore import *
+import psycopg2
+from psycopg2 import sql
 
 import EditDatabaseWindow
 
 class UserInfoWindow(QMainWindow):
-    def __init__(self, name, population ,data, admin):
+    def __init__(self, name, population ,data, admin, connection):
         super().__init__()
-
+        print(name)
         self.setWindowTitle("Info Window")
         self.editWindow = None
+        self.rowSelected = 0
+        self.connection = connection
 
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
@@ -48,6 +53,7 @@ class UserInfoWindow(QMainWindow):
         self.layout.addWidget(self.table_widget)
         self.table_widget.setColumnCount(3)
         self.table_widget.setHorizontalHeaderLabels(['Miasto','Populacja', 'Polozenie'])
+        self.table_widget.cellClicked.connect(self.cell_click_action)
 
         for row_index, row in enumerate(data):
             self.table_widget.insertRow(row_index)
@@ -68,13 +74,54 @@ class UserInfoWindow(QMainWindow):
 
         self.show()
 
+    def cell_click_action(self, row, column):
+        self.rowSelected = row
+
+    def run_query(self, query):
+        select_data_query = sql.SQL(query)
+        columns, result = self.connection.execute_query(select_data_query)
+        return (columns, result)
+
     def dodaj_miasto(self):
         # Nazwa, populacja, Po³o¿enie (point), ID_Gminy (dostaje)
-        print("Dodaj")
         self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Dodaj miasto")
+        self.editWindow.action_done.connect(self.query_dodaj_miasto)
+        self.editWindow.show()
+
+        loop = QEventLoop()
+        self.editWindow.destroyed.connect(loop.quit)
+        loop.exec()
+
+    def query_dodaj_miasto(self, nazwa, populacja, gpsX, gpsY):
+        print("query dodaj miasto")
+        options_query = '''CALL "dodajMiejscowosc"();'''.format(name)
+
 
     def edytuj_miasto(self):
-        print("Edytuj")
+        self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Edytuj miasto")
+        
+        name = self.table_widget.item(self.rowSelected, 0).text()
+        print(name)
+        options_query = '''SELECT * FROM "Miejscowosci aktualne" m WHERE 
+                            m."nazwa" = '{}';'''.format(name)
+
+        options_columns, options_result = self.run_query(options_query)
+        print(options_result)
+        res = []
+        for i in options_result:
+            res.append((i[0].split(',')[1], i[0].split(',')[2],
+                        (str(i[0].split(',')[3]) + " " + str(i[0].split(',')[4])).replace("\"", "").replace("(",
+                                                                                                            "").replace(
+                            ")", "")))
+            population += int(i[0].split(',')[2])
+
+        print(res)
+        self.editWindow.nazwa_miasta.setText(res[1])
+        self.editWindow.show()
+
+        loop = QEventLoop()
+        self.editWindow.destroyed.connect(loop.quit)
+        loop.exec()
 
     def usun_miasto(self):
         print("Usun")

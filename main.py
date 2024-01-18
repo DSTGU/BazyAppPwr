@@ -80,7 +80,7 @@ class Application():
                             ")", "")))
             population += int(i[0].split(',')[2])
 
-        self.userinfobox = UserInfoWindow.UserInfoWindow(name, population, res, self.admin)
+        self.userinfobox = UserInfoWindow.UserInfoWindow(name, population, res, self.admin, self.postgres_connection)
 
     def update_results(self):
         selected_option = self.userWindow.dropdown_kraje.currentText()
