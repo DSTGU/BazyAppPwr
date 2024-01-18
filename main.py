@@ -1,5 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, QWidget, QLineEdit
+from PyQt5.QtCore import QEventLoop
 import psycopg2
 from psycopg2 import sql
 import PostgreSQLConnection
@@ -13,6 +14,8 @@ class Application():
         self.userWindow = UserWindow.UserWindow()
         self.userWindow.searchbox.textChanged.connect(self.update_results)
         self.userWindow.table_widget.cellClicked.connect(self.create_infobox)
+        self.userWindow.loginPass.connect(self.update_login)
+
         self.postgres_connection = PostgreSQLConnection.PostgreSQLConnection(
             user="Javascript",
             password="javascript",
@@ -21,11 +24,40 @@ class Application():
             database="postgres",
         )
 
+        # self.postgres_connection.create_connection()
+
+        # (self.columns, self.data) = self.run_query('''SELECT *
+          #                                  FROM "Gminy aktualne"''')
+        '''
+        ndata = []
+        self.columns = self.limit_results(self.columns)
+        for row in self.data:
+            ndata.append(self.limit_results(row))
+        self.data = ndata
+
+
+        self.update_dropdown_kraje()
+        self.update_dropdown_powiaty()
+        self.update_results()
+        '''
+
+    def update_login(self, usr, passw, hst, prt, db):
+        self.postgres_connection = PostgreSQLConnection.PostgreSQLConnection(
+            user = usr,
+            password = passw,
+            host = hst,
+            port = prt,
+            database = db,
+        )
+
+        self.show_database()
+
+    def show_database(self):
         self.postgres_connection.create_connection()
 
         (self.columns, self.data) = self.run_query('''SELECT *
                                             FROM "Gminy aktualne"''')
-
+        
         ndata = []
         self.columns = self.limit_results(self.columns)
         for row in self.data:
