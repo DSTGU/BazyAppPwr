@@ -10,57 +10,94 @@ class UserWindow(QMainWindow):
     def __init__(self, username, token, connection):
         self.connection = connection
         super().__init__()
+        print("dupa")
 
-
-
-        if (username is None or token is None):
-            self.admin = 0
-        else:
-            self.admin = 1
 
         self.setWindowTitle("Database GUI Application")
 
         # Add a QVBoxLayout to the central widget
-        main_layout = QVBoxLayout(self)
-        central_layout = QVBoxLayout(self)
-        top_layout = QFormLayout(self)
+        self.main_layout = QVBoxLayout(self)
+        self.central_layout = QVBoxLayout(self)
+        self.top_layout = QFormLayout(self)
 
-        if (self.admin == 0):
-            # Add connect to database button
-            self.loginButton = QPushButton('Login', self)
-            top_layout.addWidget(self.loginButton)
-            self.loginButton.clicked.connect(self.showLoginWindow)
+        self.loginButton = None
+        self.loginWindow = None
+        self.searchbox = None
+        self.dropdown_kraje = None
+        self.dropdown_powiaty = None
+        self.table_widget = None
 
-            # Add login window
-            self.loginWindow = None
+        if (username is None or token is None):
+            self.admin = 0
+            self.nonAdminWindowInit()
+        else:
+            self.admin = 1
+            self.adminWindowInit()
 
-            # Add the searchbox
+        self.resize(600, 600)
+
+    def nonAdminWindowInit(self):
+
+        # Add connect to database button
+        self.loginButton = QPushButton('Login', self)
+        self.top_layout.addWidget(self.loginButton)
+        self.loginButton.clicked.connect(self.showLoginWindow)
+
+        # Add login window
+        self.loginWindow = None
+        # Add the searchbox
         self.searchbox = QLineEdit(self)
-        top_layout.addRow("Wyszukaj: ", self.searchbox)
+        self.top_layout.addRow("Wyszukaj: ", self.searchbox)
 
         # Create and add a QComboBox
         self.dropdown_kraje = QComboBox(self)
-        top_layout.addRow("Kraj: ", self.dropdown_kraje)
+        self.top_layout.addRow("Kraj: ", self.dropdown_kraje)
         # central_layout.addWidget(self.dropdown_kraje)
 
         # Create and add a QComboBox
         self.dropdown_powiaty = QComboBox(self)
-        top_layout.addRow("Powiat: ", self.dropdown_powiaty)
+        self.top_layout.addRow("Powiat: ", self.dropdown_powiaty)
         # central_layout.addWidget(self.dropdown_powiaty)
 
         # Add a QTableWidget to the central widget
         self.table_widget = QTableWidget(self)
-        central_layout.addWidget(self.table_widget)
-        
+        self.central_layout.addWidget(self.table_widget)
+
         # Set the central widget to use the QVBoxLayout
-        central_widget = QWidget(self)
-        main_layout.addLayout(top_layout)
-        main_layout.addLayout(central_layout)
-        central_widget.setLayout(main_layout)
-        self.setCentralWidget(central_widget)
+        self.central_widget = QWidget(self)
+        self.main_layout.addLayout(self.top_layout)
+        self.main_layout.addLayout(self.central_layout)
+        self.central_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.central_widget)
 
-        self.resize(600, 600)
+    def adminWindowInit(self):
 
+        # Add login window
+        self.loginWindow = None
+        # Add the searchbox
+        self.searchbox = QLineEdit(self)
+        self.top_layout.addRow("Wyszukaj: ", self.searchbox)
+
+        # Create and add a QComboBox
+        self.dropdown_kraje = QComboBox(self)
+        self.top_layout.addRow("Kraj: ", self.dropdown_kraje)
+        # central_layout.addWidget(self.dropdown_kraje)
+
+        # Create and add a QComboBox
+        self.dropdown_powiaty = QComboBox(self)
+        self.top_layout.addRow("Powiat: ", self.dropdown_powiaty)
+        # central_layout.addWidget(self.dropdown_powiaty)
+
+        # Add a QTableWidget to the central widget
+        self.table_widget = QTableWidget(self)
+        self.central_layout.addWidget(self.table_widget)
+
+        # Set the central widget to use the QVBoxLayout
+        self.central_widget = QWidget(self)
+        self.main_layout.addLayout(self.top_layout)
+        self.main_layout.addLayout(self.central_layout)
+        self.central_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.central_widget)
 
     def showLoginWindow(self):
         self.loginWindow = LoginWindow.LoginWindow(self, self.connection)
