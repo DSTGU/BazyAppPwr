@@ -12,14 +12,16 @@ import UserInfoWindow
 class Application():
 
     def __init__(self):
+        f = open("local.ini", "r")
 
         self.postgres_connection = PostgreSQLConnection.PostgreSQLConnection(
-            user="Javascript",
-            password="javascript",
-            host="localhost",
-            port="42069",
-            database="postgres",
+            user = f.readline().replace("\n", ""),
+            password = f.readline().replace("\n", ""),
+            host = f.readline().replace("\n", ""),
+            port = f.readline().replace("\n", ""),
+            database = f.readline().replace("\n", ""),
         )
+        f.close()
 
         self.userinfobox = None
         self.userWindow = UserWindow.UserWindow(None, None, self.postgres_connection)
