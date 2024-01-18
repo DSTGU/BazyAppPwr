@@ -109,7 +109,6 @@ class Application():
                     item = QTableWidgetItem(str(value))
                     self.userWindow.table_widget.setItem(row_index, col_index, item)
                 item = QTableWidgetItem("Usun")
-                print("dupa")
                 self.userWindow.table_widget.setItem(row_index, 3, item)
 
     def update_dropdown_kraje(self):
