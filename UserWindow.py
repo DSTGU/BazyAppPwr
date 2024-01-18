@@ -161,7 +161,7 @@ class UserWindow(QMainWindow):
         print("2")
     def showDodajPowiatWindow(self):
         print("3")
-    def usunGmine(self):
+    def usunGmine(self, row):
         print("4")
     def usunPowiat(self):
         print("5")

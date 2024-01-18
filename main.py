@@ -57,10 +57,10 @@ class Application():
         return (columns, result)
 
     def cell_click_action(self, row, column):
-        print(column)
         if column <= 2:
             self.create_infobox(row,column)
-            # TODO: else usun gmine
+        else:
+            self.userWindow.usunGmine(row)
 
 
     def create_infobox(self, row, column):
