@@ -36,15 +36,6 @@ class UserWindow(QMainWindow):
         self.searchbox = QLineEdit(self)
         central_layout.addWidget(self.searchbox)
 
-        
-        # Create and add a QComboBox
-        self.dropdown_view = QComboBox(self)
-        central_layout.addWidget(self.dropdown_view)
-        itemsy = ["Kraje", "Powiaty", "Gminy", "Miejscowosci"]
-        self.dropdown_view.addItems(itemsy)
-        self.dropdown_view.setCurrentText("Gminy")
-        
-
         # Create and add a QComboBox
         self.dropdown_kraje = QComboBox(self)
         central_layout.addWidget(self.dropdown_kraje)
@@ -52,10 +43,6 @@ class UserWindow(QMainWindow):
         # Create and add a QComboBox
         self.dropdown_powiaty = QComboBox(self)
         central_layout.addWidget(self.dropdown_powiaty)
-
-        # Create and add a QComboBox
-        self.dropdown_gminy = QComboBox(self)
-        central_layout.addWidget(self.dropdown_gminy)
 
         # Add a QTableWidget to the central widget
         self.table_widget = QTableWidget(self)
