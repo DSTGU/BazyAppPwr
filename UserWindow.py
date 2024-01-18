@@ -6,24 +6,33 @@ from PyQt5.QtCore import QEventLoop, pyqtSlot, pyqtSignal
 import LoginWindow
 
 class UserWindow(QMainWindow):
-    loginPass = pyqtSignal(str, str, str, str, str)
-
-    def __init__(self):
+    loginPassup = pyqtSignal(str, str)#([username, token])
+    def __init__(self, username, token, connection):
+        self.connection = connection
         super().__init__()
+
+
+
+        if (username is None or token is None):
+            self.admin = 0
+        else:
+            self.admin = 1
+
         self.setWindowTitle("Database GUI Application")
 
         # Add a QVBoxLayout to the central widget
         central_layout = QVBoxLayout(self)
 
-        # Add connect to database button
-        self.connectDbButton = QPushButton('Connect to database', self)
-        central_layout.addWidget(self.connectDbButton)
-        self.connectDbButton.clicked.connect(self.showLoginWindow)
+        if (self.admin == 0):
+            # Add connect to database button
+            self.loginButton = QPushButton('Login', self)
+            central_layout.addWidget(self.loginButton)
+            self.loginButton.clicked.connect(self.showLoginWindow)
 
-        # Add login window
-        self.loginWindow = None
+            # Add login window
+            self.loginWindow = None
 
-        # Add the searchbox
+            # Add the searchbox
         self.searchbox = QLineEdit(self)
         central_layout.addWidget(self.searchbox)
 
@@ -44,15 +53,17 @@ class UserWindow(QMainWindow):
         central_widget.setLayout(central_layout)
         self.setCentralWidget(central_widget)
 
-        self.resize(450,600)
+        self.resize(450, 600)
+
 
     def showLoginWindow(self):
-        self.loginWindow = LoginWindow.LoginWindow()
+        self.loginWindow = LoginWindow.LoginWindow(self, self.connection)
+        self.loginWindow.loginPass.connect(self.passup)
         self.loginWindow.show()
         loop = QEventLoop()
         self.loginWindow.destroyed.connect(loop.quit)
-        self.loginWindow.button.clicked.connect(self.on_login_confirm)
         loop.exec()
 
-    def on_login_confirm(self, emit): #usr, passw, hst, prt, db):
-        self.loginPass.emit(self.loginWindow.username, self.loginWindow.password, self.loginWindow.host, self.loginWindow.port, self.loginWindow.database)
+    def passup(self, username, token):
+        print("Passed one")
+        self.loginPassup.emit(username,token)

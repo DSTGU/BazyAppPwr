@@ -1,18 +1,16 @@
 from PyQt5.QtWidgets import QLineEdit, QPushButton, QWidget, QVBoxLayout, QMessageBox, QLabel, QFormLayout
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from psycopg2 import sql
 
 class LoginWindow(QWidget):
-    loginPass = pyqtSignal(bool)#([str, str, str, str, str])
+    loginPass = pyqtSignal(str, str)#([username, token])
 
-    def __init__(self):
+    def __init__(self, userWindow, connection):
         super().__init__()
-        
-        # Defaults
-        self.username = "postgres"
-        self.password = "postgres"
-        self.host = "localhost"
-        self.port = "5432"
-        self.database = "postgres"
+        self.connection = connection
+
+        self.username = ""
+        self.password = ""
 
         # layout = QVBoxLayout()
         layout = QFormLayout()
@@ -25,18 +23,6 @@ class LoginWindow(QWidget):
         self.passwordText.move(20, 80)
         self.passwordText.resize(280, 40)
 
-        self.hostText = QLineEdit(self)
-        self.hostText.move(20, 140)
-        self.hostText.resize(280, 40)
-
-        self.portText = QLineEdit(self)
-        self.portText.move(20, 200)
-        self.portText.resize(280, 40)
-
-        self.databaseText = QLineEdit(self)
-        self.databaseText.move(20, 260)
-        self.databaseText.resize(280, 40)
-
         self.button = QPushButton('Login', self)
         self.button.move(20, 320)
 
@@ -44,25 +30,19 @@ class LoginWindow(QWidget):
 
         layout.addRow("User", self.usernameText)
         layout.addRow("Password", self.passwordText)
-        # layout.addWidget(self.usernameText)
-        # layout.addWidget(self.passwordText)
-        layout.addRow("Host", self.hostText)
-        layout.addRow("Port", self.portText)
-        layout.addRow("Database", self.databaseText)
 
         layout.addWidget(self.button)
-
         self.setLayout(layout)
+
+        self.userWindow = userWindow
 
     @pyqtSlot()
     def on_click(self):
         self.username = self.usernameText.text()
         self.password = self.passwordText.text()
-        self.host = self.hostText.text()
-        self.port = self.portText.text()
-        self.database = self.databaseText.text()
 
-        # QMessageBox.question(self, 'MSBox', "Napisales: " + self.usernameText.text(), QMessageBox.Ok, QMessageBox.Ok)
-        # self.usernameText.setText("")
-        self.loginPass.emit(True)
-        self.close()
+        columns, result = self.connection.execute_query(sql.SQL("Select zaloguj('{}','{}')".format(self.username, self.password)))
+
+        if(result[0][0] is not None):
+            self.loginPass.emit(self.username, result[0][0])
+            self.close()

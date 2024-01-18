@@ -1,20 +1,17 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, QWidget, QLineEdit
-from PyQt5.QtCore import QEventLoop
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, QWidget, \
+    QLineEdit
+from PyQt5.QtCore import QEventLoop, pyqtSignal
 import psycopg2
 from psycopg2 import sql
 import PostgreSQLConnection
 import UserWindow
 import UserInfoWindow
 
+
 class Application():
 
     def __init__(self):
-        self.userinfobox = None
-        self.userWindow = UserWindow.UserWindow()
-        self.userWindow.searchbox.textChanged.connect(self.update_results)
-        self.userWindow.table_widget.cellClicked.connect(self.create_infobox)
-        self.userWindow.loginPass.connect(self.update_login)
 
         self.postgres_connection = PostgreSQLConnection.PostgreSQLConnection(
             user="Javascript",
@@ -24,56 +21,41 @@ class Application():
             database="postgres",
         )
 
-        # self.postgres_connection.create_connection()
-
-        # (self.columns, self.data) = self.run_query('''SELECT *
-          #                                  FROM "Gminy aktualne"''')
-        '''
-        ndata = []
-        self.columns = self.limit_results(self.columns)
-        for row in self.data:
-            ndata.append(self.limit_results(row))
-        self.data = ndata
-
-
-        self.update_dropdown_kraje()
-        self.update_dropdown_powiaty()
-        self.update_results()
-        '''
-
-    def update_login(self, usr, passw, hst, prt, db):
-        self.postgres_connection = PostgreSQLConnection.PostgreSQLConnection(
-            user = usr,
-            password = passw,
-            host = hst,
-            port = prt,
-            database = db,
-        )
+        self.userinfobox = None
+        self.userWindow = UserWindow.UserWindow(None, None, self.postgres_connection)
+        self.userWindow.loginPassup.connect(self.update_window)
+        self.userWindow.searchbox.textChanged.connect(self.update_results)
+        self.userWindow.table_widget.cellClicked.connect(self.create_infobox)
+        # self.userWindow.loginPass.connect(self.update_login)
 
         self.show_database()
+
+        self.kraje = []
 
     def show_database(self):
         self.postgres_connection.create_connection()
 
         (self.columns, self.data) = self.run_query('''SELECT *
                                             FROM "Gminy aktualne"''')
-        
-        ndata = []
-        self.columns = self.limit_results(self.columns)
-        for row in self.data:
-            ndata.append(self.limit_results(row))
-        self.data = ndata
 
+        ndata = []
+        self.columns = limit_results(self.columns)
+        for row in self.data:
+            ndata.append(limit_results(row))
+        self.data = ndata
 
         self.update_dropdown_kraje()
         self.update_dropdown_powiaty()
         self.update_results()
 
+    def run_query(self, query):
+        select_data_query = sql.SQL(query)
+        columns, result = self.postgres_connection.execute_query(select_data_query)
+        return (columns, result)
+
     def create_infobox(self, row, column):
 
-        name = self.userWindow.table_widget.item(row,0).text()
-
-
+        name = self.userWindow.table_widget.item(row, 0).text()
 
         options_query = '''SELECT pokazpodleglemiejscowosci('{}')'''.format(name)
 
@@ -82,51 +64,18 @@ class Application():
         population = 0
         print(options_result)
         for i in options_result:
-            res.append((i[0].split(',')[1], i[0].split(',')[2], (str(i[0].split(',')[3]) + " " + str(i[0].split(',')[4])).replace("\"", "").replace("(","").replace(")","")))
+            res.append((i[0].split(',')[1], i[0].split(',')[2],
+                        (str(i[0].split(',')[3]) + " " + str(i[0].split(',')[4])).replace("\"", "").replace("(",
+                                                                                                            "").replace(
+                            ")", "")))
             population += int(i[0].split(',')[2])
 
         self.userinfobox = UserInfoWindow.UserInfoWindow(name, population, res)
 
-
-
-
-
-
-
-    def run_query(self, query):
-        select_data_query = sql.SQL(query)
-        columns, result = self.postgres_connection.execute_query(select_data_query)
-        return (columns, result)
-
-    def limit_results(self, list):
-        return [list[2], list[4], list[6]]
-
-    def retain_results(self, data, kraj, powiat, nazwa):
-        if (kraj != "No filter"):
-            ndata = []
-            for i in data:
-                if i[2] == kraj:
-                    ndata.append(i)
-            data = ndata
-        if (powiat != "No filter"):
-            ndata = []
-            for i in data:
-                if i[1] == powiat:
-                    ndata.append(i)
-            data = ndata
-
-        ndata = []
-
-        for i in data:
-            if nazwa in i[0]:
-                ndata.append(i)
-        data = ndata
-        return data
-
     def update_results(self):
         selected_option = self.userWindow.dropdown_kraje.currentText()
         selected_powiat = self.userWindow.dropdown_powiaty.currentText()
-        data = self.retain_results(self.data, selected_option, selected_powiat, self.userWindow.searchbox.displayText())
+        data = retain_results(self.data, selected_option, selected_powiat, self.userWindow.searchbox.displayText())
 
         self.userWindow.table_widget.clear()
         self.userWindow.table_widget.setRowCount(0)
@@ -138,17 +87,14 @@ class Application():
                 item = QTableWidgetItem(str(value))
                 self.userWindow.table_widget.setItem(row_index, col_index, item)
 
-
-
-
     def update_dropdown_kraje(self):
         # Fetch available osptions from the database
         options_query = '''SELECT pokazkrajezwiazkowe()'''
         options_columns, options_result = self.run_query(options_query)
         self.kraje = options_result
 
-        options = [row[0].split(",")[1].replace("\"","") for row in options_result]
-        options.insert(0,"No filter")
+        options = [row[0].split(",")[1].replace("\"", "") for row in options_result]
+        options.insert(0, "No filter")
         # Populate the dropdown list with options
         self.userWindow.dropdown_kraje.addItems(options)
 
@@ -163,7 +109,6 @@ class Application():
         options_columns, options_result = self.run_query(options_query)
         self.kraje = options_result
 
-
         options = [row[0].split(",")[1].replace("\"", "") for row in options_result]
         options.insert(0, "No filter")
         # Populate the dropdown list with options
@@ -172,6 +117,41 @@ class Application():
         # Connect the dropdown's currentIndexChanged signal to a slot (e.g., update_table)
         self.userWindow.dropdown_powiaty.currentIndexChanged.connect(self.update_results)
 
+    def update_window(self, username, token):
+
+
+        self.userWindow.close()
+        newuserWindow = UserWindow.UserWindow(username, token, self.postgres_connection)
+        newuserWindow.show()
+        self.userWindow = newuserWindow
+        self.show_database()
+
+
+def limit_results(list):
+    return [list[2], list[4], list[6]]
+
+
+def retain_results(data, kraj, powiat, nazwa):
+    if (kraj != "No filter"):
+        ndata = []
+        for i in data:
+            if i[2] == kraj:
+                ndata.append(i)
+        data = ndata
+    if (powiat != "No filter"):
+        ndata = []
+        for i in data:
+            if i[1] == powiat:
+                ndata.append(i)
+        data = ndata
+
+    ndata = []
+
+    for i in data:
+        if nazwa in i[0]:
+            ndata.append(i)
+    data = ndata
+    return data
 
 
 if __name__ == "__main__":
