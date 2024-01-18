@@ -1,14 +1,15 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, \
     QWidget, QLineEdit, QHeaderView, QPushButton, QFormLayout, QHBoxLayout, QLabel, QStyle
-
 from PyQt5.QtCore import QEventLoop, pyqtSlot, pyqtSignal
-
 from PyQt5.QtGui import QIcon
+from psycopg2 import sql
 
 import LoginWindow
+import PostgreSQLConnection
 
 class UserWindow(QMainWindow):
     loginPassup = pyqtSignal(str, str)#([username, token])
+    refresh = pyqtSignal()
     def __init__(self, username, token, connection):
         self.connection = connection
         super().__init__()
@@ -26,6 +27,8 @@ class UserWindow(QMainWindow):
         self.dropdown_kraje = None
         self.dropdown_powiaty = None
         self.table_widget = None
+        self.username = username
+        self.token = token
 
         if (username is None or token is None):
             self.admin = 0
@@ -162,7 +165,11 @@ class UserWindow(QMainWindow):
     def showDodajPowiatWindow(self):
         print("3")
     def usunGmine(self, row):
-        print("4")
+        name = self.table_widget.item(row, 0).text()
+        print("CALL \"usunGmina\"('{}','{}','{}')".format(name, self.username, self.token))
+        self.run_query("CALL \"usunGmina\"('{}','{}','{}')".format(name, self.username, self.token))
+        self.refresh.emit()
+
     def usunPowiat(self):
         print("5")
     def usunKraj(self):
@@ -176,3 +183,9 @@ class UserWindow(QMainWindow):
     def passup(self, username, token):
         print("Passed one")
         self.loginPassup.emit(username,token)
+
+    def run_query(self, query):
+
+        select_data_query = sql.SQL(query)
+        self.connection.execute_query(select_data_query, fetch_result=False)
+
