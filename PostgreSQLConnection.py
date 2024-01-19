@@ -43,3 +43,15 @@ class PostgreSQLConnection:
             print(f"Error: Unable to execute the query. {e}")
         finally:
             cursor.close()
+
+    def execute_call(self, call):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute(call)
+            self.connection.commit()
+            print("Call executed successfully.")
+
+        except psycopg2.Error as e:
+            print(f"Error: Unable to execute the call. {e}")
+        finally:
+            cursor.close()

@@ -57,6 +57,10 @@ class Application():
         columns, result = self.postgres_connection.execute_query(select_data_query)
         return (columns, result)
 
+    def run_call(self, call):
+        select_call = sql.SQL(call)
+        self.postgres_connection.execute_call(select_call)
+
     def cell_click_action(self, row, column):
         if column <= 2:
             self.create_infobox(row,column)
@@ -88,11 +92,13 @@ class Application():
         if (actionType == "Dodaj miasto"):
             options_query = '''CALL "dodajMiejscowosc"('{}', {}, {}, point({},{}), '{}', '{}');'''.format(
                 name, idIn, population, gpsX, gpsY, self.userWindow.username, self.userWindow.token)
-            options_columns, options_result = self.run_query(options_query)
+            self.run_call(options_query)
+
         elif (actionType == "Usun miasto"):
             options_query = '''CALL "usunMiejscowosc"({}, '{}', '{}');'''.format(
                 idIn, self.userWindow.username, self.userWindow.token)
-            options_columns, options_result = self.run_query(options_query, False)
+            self.run_call(options_query)
+        
         elif (actionType == "Edytuj miasto"):
             # Zapisane stare dane
             miejscowoscStare = '''SELECT * FROM "Miejscowosci aktualne" m WHERE 
