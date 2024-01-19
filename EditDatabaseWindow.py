@@ -40,6 +40,7 @@ class EditDatabaseWindow(QMainWindow):
             self.ok_button.clicked.connect(self.delete_thing)
 
         self.input_layout.addRow(self.ok_button, self.cancel_button)
+        self.resize(400, 200)
 
     def check_data(self):
         if (self.nazwa_miasta.displayText() != "" 

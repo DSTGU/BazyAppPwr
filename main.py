@@ -106,9 +106,10 @@ class Application():
             # Usunac, stworzyc nowe, podpiac ew kody
             options_query = '''CALL "usunMiejscowosc"({}, '{}', '{}');'''.format(
                 idIn, self.userWindow.username, self.userWindow.token)
-            options_columns, options_result = self.run_query(options_query, None, False)
+            self.run_call(options_query)
 
-            
+        elif (actionType == "Edytuj gmine"):
+            print("Edytuj gmine")
 
 
     def update_results(self):

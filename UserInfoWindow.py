@@ -81,6 +81,36 @@ class UserInfoWindow(QMainWindow):
     def cell_click_action(self, row, column):
         self.rowSelected = row
 
+    def update_results(self):
+        self.table_widget.clear()
+        self.table_widget.setRowCount(0)
+        self.table_widget.setColumnCount(3)
+        self.table_widget.setHorizontalHeaderLabels(['Miasto','Populacja', 'Polozenie'])
+        self.table_widget.cellClicked.connect(self.cell_click_action)
+
+        options_query = '''SELECT pokazpodleglemiejscowosci('{}')'''.format(self.name)
+
+        options_columns, options_result = self.run_query(options_query)
+        res = []
+        population = 0
+        #print(options_result)
+        for i in options_result:
+            res.append((i[0].split(',')[1], i[0].split(',')[2],
+                        (str(i[0].split(',')[3]) + " " + str(i[0].split(',')[4])).replace("\"", "").replace("(",
+                                                                                                            "").replace(
+                            ")", "")))
+            population += int(i[0].split(',')[2])
+
+        self.label2.setText(str(population))
+
+        for row_index, row in enumerate(res):
+            self.table_widget.insertRow(row_index)
+            for col_index, value in enumerate(row):
+                if value == "" or value == " ":
+                    value = "No value"
+                item = QTableWidgetItem(str(value))
+                self.table_widget.setItem(row_index, col_index, item)
+
     def run_query(self, query):
         select_data_query = sql.SQL(query)
         columns, result = self.connection.execute_query(select_data_query)
@@ -105,6 +135,8 @@ class UserInfoWindow(QMainWindow):
         options_columns, options_result = self.run_query(options_query)
 
         self.action.emit("Dodaj miasto", nazwa, (options_result[0])[0], populacja, gpsX, gpsY)
+
+        self.update_results()
 
     def edytuj_miasto(self):
         self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Edytuj miasto")
@@ -145,6 +177,8 @@ class UserInfoWindow(QMainWindow):
 
         self.action.emit("Edytuj miasto", nazwa, (options_result[0])[0], populacja, gpsX, gpsY)
 
+        self.update_results()
+
     def usun_miasto(self):
         self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Usun miasto")
         self.editWindow.action_done.connect(self.query_usun_miasto)
@@ -168,6 +202,8 @@ class UserInfoWindow(QMainWindow):
         # print(idM)
         self.action.emit("Usun miasto", nazwa, (options_result[0])[0], populacja, gpsX, gpsY)
         # options_query = '''CALL "usunMiejscowosc"({}, );'''.format(idM)
+
+        self.update_results()
 
     def edytuj_gmine(self):
         self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Edytuj gmine")
@@ -197,3 +233,4 @@ class UserInfoWindow(QMainWindow):
     def query_edytuj_gmine(self, nazwa, populacja, gpsX, gpsY):
         print("Query edytuj gmine")
         self.action.emit("Edytuj gmine", nazwa, 0, populacja, gpsX, gpsY)
+        self.update_results()
