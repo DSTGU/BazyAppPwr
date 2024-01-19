@@ -44,10 +44,10 @@ class EditDatabaseWindow(QMainWindow):
     def check_data(self):
         if (self.nazwa_miasta.displayText() != "" 
                 and int(self.populacja_miasta.displayText()) > 0
-                and self.polozenieX_miasta.displayText() != ""
-                and self.polozenieY_miasta.displayText() != ""):
+                # and self.polozenieX_miasta.displayText() != ""
+        ):#and self.polozenieY_miasta.displayText() != ""):
             print("dobrze")
-            self.action_done.emit(self.nazwa_miasta.displayText(), int(self.populacja_miasta.displayText()),
+            self.action_done.emit(self.nazwa_miasta.displayText().strip('"\''), int(self.populacja_miasta.displayText()),
                                   float(self.polozenieX_miasta.displayText()), float(self.polozenieY_miasta.displayText()))
             self.close()
 

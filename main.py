@@ -82,6 +82,28 @@ class Application():
             population += int(i[0].split(',')[2])
 
         self.userinfobox = UserInfoWindow.UserInfoWindow(name, population, res, self.admin, self.postgres_connection)
+        self.userinfobox.action.connect(self.inbox_query)
+
+    def inbox_query(self, actionType, name, idIn, population, gpsX, gpsY):
+        if (actionType == "Dodaj miasto"):
+            options_query = '''CALL "dodajMiejscowosc"('{}', {}, {}, point({},{}), '{}', '{}');'''.format(
+                name, idIn, population, gpsX, gpsY, self.userWindow.username, self.userWindow.token)
+            options_columns, options_result = self.run_query(options_query)
+        elif (actionType == "Usun miasto"):
+            options_query = '''CALL "usunMiejscowosc"({}, '{}', '{}');'''.format(
+                idIn, self.userWindow.username, self.userWindow.token)
+            options_columns, options_result = self.run_query(options_query, False)
+        elif (actionType == "Edytuj miasto"):
+            # Zapisane stare dane
+            miejscowoscStare = '''SELECT * FROM "Miejscowosci aktualne" m WHERE 
+                            m."ID" = {};'''.format(idIn)
+            # Usunac, stworzyc nowe, podpiac ew kody
+            options_query = '''CALL "usunMiejscowosc"({}, '{}', '{}');'''.format(
+                idIn, self.userWindow.username, self.userWindow.token)
+            options_columns, options_result = self.run_query(options_query, None, False)
+
+            
+
 
     def update_results(self):
         selected_option = self.userWindow.dropdown_kraje.currentText()
