@@ -6,6 +6,7 @@ from psycopg2 import sql
 
 import LoginWindow
 import PostgreSQLConnection
+import dodajGmineWindow
 
 class UserWindow(QMainWindow):
     loginPassup = pyqtSignal(str, str)#([username, token])
@@ -94,11 +95,6 @@ class UserWindow(QMainWindow):
         krajeHBox.addWidget(dodajKrajButton)
         dodajKrajButton.clicked.connect(self.showDodajKrajWindow)
 
-        usunKrajButton = QPushButton(self)
-        usunKrajButton.setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
-        krajeHBox.addWidget(usunKrajButton)
-        usunKrajButton.clicked.connect(self.usunKraj)
-
         edytujKrajButton = QPushButton(self)
         edytujKrajButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
         krajeHBox.addWidget(edytujKrajButton)
@@ -160,6 +156,7 @@ class UserWindow(QMainWindow):
 
     def showDodajGmineWindow(self):
         print("1")
+        okno = dodajGmineWindow.DodajGmineWindow()
     def showDodajKrajWindow(self):
         print("2")
     def showDodajPowiatWindow(self):
@@ -177,8 +174,6 @@ class UserWindow(QMainWindow):
         self.run_query("CALL \"usunPowiat\"('{}','{}','{}')".format(name, self.username, self.token))
         self.refresh.emit()
 
-    def usunKraj(self):
-        print("6")
     def showEdytujPowiatWindow(self):
         print("7")
     def showEdytujKrajWindow(self):
