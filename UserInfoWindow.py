@@ -96,7 +96,6 @@ class UserInfoWindow(QMainWindow):
         print("query dodaj miasto")
         options_query = '''CALL "dodajMiejscowosc"();'''.format(name)
 
-
     def edytuj_miasto(self):
         self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Edytuj miasto")
         
@@ -123,8 +122,29 @@ class UserInfoWindow(QMainWindow):
         self.editWindow.destroyed.connect(loop.quit)
         loop.exec()
 
+    def query_edytuj_miasto(self):
+        print("query Edytuj miasto")
+
     def usun_miasto(self):
-        print("Usun")
+        self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Usun miasto")
+        self.editWindow.action_done.connect(self.query_usun_miasto)
+        self.editWindow.show()
+
+        loop = QEventLoop()
+        self.editWindow.destroyed.connect(loop.quit)
+        loop.exec()
+
+    def query_usun_miasto(self, nazwa, populacja, gpsX, gpsY):
+        print("query_usun")
 
     def edytuj_gmine(self):
-        print("Usun")
+        self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Edytuj gmine")
+        # self.editWindow.action_done.connect(self.query_dodaj_miasto)
+        self.editWindow.show()
+
+        loop = QEventLoop()
+        self.editWindow.destroyed.connect(loop.quit)
+        loop.exec()
+
+    def query_edytuj_gmine(self):
+        print("Query edytuj gmine")
