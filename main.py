@@ -27,6 +27,8 @@ class Application():
         self.userWindow = UserWindow.UserWindow(None, None, self.postgres_connection)
         self.userWindow.loginPassup.connect(self.update_window)
         self.userWindow.refresh.connect(self.update_results)
+        self.userWindow.refreshpowiaty.connect(self.update_dropdown_powiaty)
+        self.userWindow.refreshkraje.connect(self.update_dropdown_kraje)
         self.userWindow.searchbox.textChanged.connect(self.update_results)
         self.userWindow.table_widget.cellClicked.connect(self.cell_click_action)
         # self.userWindow.loginPass.connect(self.update_login)
@@ -100,10 +102,10 @@ class Application():
                     self.userWindow.table_widget.setItem(row_index, col_index, item)
 
         else:
-            columns = self.columns
-            columns.append("Delete")
-            self.userWindow.table_widget.setColumnCount(len(columns))
-            self.userWindow.table_widget.setHorizontalHeaderLabels(columns)
+            cols = self.columns.copy()
+            cols.append("Delete")
+            self.userWindow.table_widget.setColumnCount(len(cols))
+            self.userWindow.table_widget.setHorizontalHeaderLabels(cols)
             for row_index, row in enumerate(data):
                 self.userWindow.table_widget.insertRow(row_index)
                 for col_index, value in enumerate(row):
@@ -151,6 +153,8 @@ class Application():
         self.userWindow = newuserWindow
         self.userWindow.loginPassup.connect(self.update_window)
         self.userWindow.refresh.connect(self.update_results)
+        self.userWindow.refreshpowiaty.connect(self.update_dropdown_powiaty)
+        self.userWindow.refreshkraje.connect(self.update_dropdown_kraje)
         self.userWindow.searchbox.textChanged.connect(self.update_results)
         self.userWindow.table_widget.cellClicked.connect(self.cell_click_action)
         self.admin = 1
