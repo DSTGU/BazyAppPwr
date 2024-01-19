@@ -10,6 +10,8 @@ import PostgreSQLConnection
 class UserWindow(QMainWindow):
     loginPassup = pyqtSignal(str, str)#([username, token])
     refresh = pyqtSignal()
+    refreshpowiaty = pyqtSignal()
+    refreshkraje = pyqtSignal()
     def __init__(self, username, token, connection):
         self.connection = connection
         super().__init__()
@@ -164,6 +166,7 @@ class UserWindow(QMainWindow):
         print("2")
     def showDodajPowiatWindow(self):
         print("3")
+
     def usunGmine(self, row):
         name = self.table_widget.item(row, 0).text()
         print("CALL \"usunGmina\"('{}','{}','{}')".format(name, self.username, self.token))
@@ -171,7 +174,11 @@ class UserWindow(QMainWindow):
         self.refresh.emit()
 
     def usunPowiat(self):
-        print("5")
+        name = self.dropdown_powiaty.currentText()
+        print("CALL \"usunPowiat\"('{}','{}','{}')".format(name, self.username, self.token))
+        self.run_query("CALL \"usunPowiat\"('{}','{}','{}')".format(name, self.username, self.token))
+        self.refreshpowiaty.emit()
+
     def usunKraj(self):
         print("6")
     def showEdytujPowiatWindow(self):
