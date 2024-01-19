@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLi
 from PyQt5.QtCore import pyqtSignal
 
 class EditDatabaseWindow(QMainWindow):
-    action_done = pyqtSignal(str, int, float, float)
+    action_done = pyqtSignal(str, int, str, str)
 
     def __init__(self, windowName):
         super().__init__()
@@ -19,28 +19,33 @@ class EditDatabaseWindow(QMainWindow):
         self.cancel_button.clicked.connect(self.exit_window)
 
         if (str(windowName) != "Usun miasto"):
+            self.resize(400, 200)
             self.nazwa_miasta = QLineEdit(self)
             self.input_layout.addRow("Nazwa miasta:", self.nazwa_miasta)
 
-            self.populacja_miasta = None
+            self.populacja_miasta = QLineEdit(self)
             self.polozenieX_miasta = None
             self.polozenieY_miasta = None
 
             if (str(windowName) != "Edytuj gmine"):
                 self.ok_button.clicked.connect(self.check_data)
 
-                self.populacja_miasta = QLineEdit(self)
                 self.input_layout.addRow("Populacja:", self.populacja_miasta)
 
                 self.polozenieX_miasta = QLineEdit(self)
                 self.polozenieY_miasta = QLineEdit(self)
                 self.input_layout.addRow("Polozenie X:", self.polozenieX_miasta)
                 self.input_layout.addRow("Polozenie Y:", self.polozenieY_miasta)
+            else:
+                self.input_layout.addRow("Nazwa: ", self.populacja_miasta)
+                # self.layout_addRow()
+
         else:
             self.ok_button.clicked.connect(self.delete_thing)
+            self.resize(100, 100)
 
         self.input_layout.addRow(self.ok_button, self.cancel_button)
-        self.resize(400, 200)
+        
 
     def check_data(self):
         if (self.nazwa_miasta.displayText() != "" 
@@ -49,11 +54,11 @@ class EditDatabaseWindow(QMainWindow):
         ):#and self.polozenieY_miasta.displayText() != ""):
             print("dobrze")
             self.action_done.emit(self.nazwa_miasta.displayText().strip('"\''), int(self.populacja_miasta.displayText()),
-                                  float(self.polozenieX_miasta.displayText()), float(self.polozenieY_miasta.displayText()))
+                                  str(self.polozenieX_miasta.displayText()), str(self.polozenieY_miasta.displayText()))
             self.close()
 
     def delete_thing(self):
-        self.action_done.emit("1", 2, 3.0, 4.0)
+        self.action_done.emit("1", "Usun miasto", str(3.0), str(4.0))
         self.close()
 
     def exit_window(self):

@@ -8,7 +8,7 @@ from psycopg2 import sql
 import EditDatabaseWindow
 
 class UserInfoWindow(QMainWindow):
-    action = pyqtSignal(str, str, int, int, float, float)# query, rest
+    action = pyqtSignal(str, str, int, int, str, str)# query, rest
 
     def __init__(self, name, population, data, admin, connection):
         super().__init__()
@@ -142,7 +142,7 @@ class UserInfoWindow(QMainWindow):
         self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Edytuj miasto")
         self.editWindow.action_done.connect(self.query_edytuj_miasto)
         name = self.table_widget.item(self.rowSelected, 0).text()
-        print(name)
+        
         options_query = '''SELECT * FROM "Miejscowosci aktualne" m WHERE 
                             m."nazwa" = '{}';'''.format(name)
 
@@ -154,19 +154,30 @@ class UserInfoWindow(QMainWindow):
             for j in i:
                 res.append(j)
                 
-        print(res)
         self.editWindow.nazwa_miasta.setText(res[1])
         self.editWindow.populacja_miasta.setText(str(res[2]))
-        # ? PlaceholderGmina1 test
-        self.editWindow.polozenieX_miasta.setText(str(res[3]))
-        self.editWindow.polozenieY_miasta.setText(str(res[3]))
+
+        if (res[3] is not None):
+            getValues = str(res[3]).split(',')
+            valRes = []
+            for i in getValues:
+                i = i.replace("(","")
+                i = i.replace(")","")
+                valRes.append(i)
+
+            self.editWindow.polozenieX_miasta.setText(str(valRes[0]))
+            self.editWindow.polozenieY_miasta.setText(str(valRes[1]))
+        else:
+            self.editWindow.polozenieX_miasta.setText(str(res[3]))
+            self.editWindow.polozenieY_miasta.setText(str(res[3]))
+
         self.editWindow.show()
 
         loop = QEventLoop()
         self.editWindow.destroyed.connect(loop.quit)
         loop.exec()
 
-    def query_edytuj_miasto(self):
+    def query_edytuj_miasto(self, nazwa, populacja, gpsX, gpsY):
         print("query Edytuj miasto")
         name = self.table_widget.item(self.rowSelected, 0).text()
 
@@ -200,7 +211,7 @@ class UserInfoWindow(QMainWindow):
         # idM = (options_result[0])[0]
 
         # print(idM)
-        self.action.emit("Usun miasto", nazwa, (options_result[0])[0], populacja, gpsX, gpsY)
+        self.action.emit("Usun miasto", name, (options_result[0])[0], populacja, gpsX, gpsY)
         # options_query = '''CALL "usunMiejscowosc"({}, );'''.format(idM)
 
         self.update_results()
@@ -232,5 +243,5 @@ class UserInfoWindow(QMainWindow):
 
     def query_edytuj_gmine(self, nazwa, populacja, gpsX, gpsY):
         print("Query edytuj gmine")
-        self.action.emit("Edytuj gmine", nazwa, 0, populacja, gpsX, gpsY)
+        self.action.emit("Edytuj gmine", self.name, 0, populacja, gpsX, gpsY)
         self.update_results()

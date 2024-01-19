@@ -89,6 +89,9 @@ class Application():
         self.userinfobox.action.connect(self.inbox_query)
 
     def inbox_query(self, actionType, name, idIn, population, gpsX, gpsY):
+        gpsX = gpsX.replace(",", "")
+        gpsY = gpsY.replace(",", "")
+
         if (actionType == "Dodaj miasto"):
             options_query = '''CALL "dodajMiejscowosc"('{}', {}, {}, point({},{}), '{}', '{}');'''.format(
                 name, idIn, population, gpsX, gpsY, self.userWindow.username, self.userWindow.token)
@@ -101,15 +104,78 @@ class Application():
         
         elif (actionType == "Edytuj miasto"):
             # Zapisane stare dane
-            miejscowoscStare = '''SELECT * FROM "Miejscowosci aktualne" m WHERE 
+            options_query = '''SELECT * FROM "Miejscowosci aktualne" m WHERE 
                             m."ID" = {};'''.format(idIn)
+
+            options_columns, stareMiejsc = self.run_query(options_query)
+
             # Usunac, stworzyc nowe, podpiac ew kody
             options_query = '''CALL "usunMiejscowosc"({}, '{}', '{}');'''.format(
                 idIn, self.userWindow.username, self.userWindow.token)
-            self.run_call(options_query)
+            # self.run_call(options_query)
+
+            options_query = '''CALL "dodajMiejscowosc"('{}', {}, {}, point({}, {}), '{}', '{}');'''.format(
+                name, (stareMiejsc[0])[4], population, gpsX, gpsY, self.userWindow.username, self.userWindow.token)
+            # self.run_call(options_query)
+            print(options_query)
+
+            # TODO: Kody
+            options_query = '''SELECT pokazkodymiejscowosci('{}', {});'''.format((stareMiejsc[0])[1], (stareMiejsc[0])[0])
+            options_columns, options_result = self.run_query(options_query)
+
+            codes = []
+            for i in options_result:
+                codes.append(((i[0].split(','))[0]).replace("(",""))
+
+            print(codes)
+
+            options_query = '''SELECT m."ID" FROM "Miejscowosci aktualne" m WHERE 
+                            m."nazwa" = '{}';'''.format(name)
+            options_columns, options_result = self.run_query(options_query)
+
+            for code in codes:
+                options_query = '''CALL "zmienPrzynaleznoscKoduPocz"({}, {}, '{}', '{}');'''.format(
+                    code, (options_result[0])[0], self.userWindow.username, self.userWindow.token)
+                # self.run_call(options_query)
+                print(options_query)
 
         elif (actionType == "Edytuj gmine"):
             print("Edytuj gmine")
+            options_query = '''SELECT * FROM "Gminy aktualne" g WHERE 
+                            g."id_gminy" = {};'''.format(idIn)
+
+            options_columns, staraGmina = self.run_query(options_query)
+
+            # Usunac, stworzyc nowe, podpiac miejscowosci
+            options_query = '''CALL "usunGmina"({}, '{}', '{}');'''.format(
+                name, self.userWindow.username, self.userWindow.token)
+            # self.run_call(options_query)
+            print(options_query)
+
+            options_query = '''CALL "dodajGmine"('{}', {}, '{}', '{}');'''.format(
+                name, (stareMiejsc[0])[3], self.userWindow.username, self.userWindow.token)
+            # self.run_call(options_query)
+            print(options_query)
+
+            # TODO: Miejscowosci
+            options_query = '''SELECT pokazpodleglemiejscowosci('{}');'''.format(name)
+            options_columns, options_result = self.run_query(options_query)
+
+            miejscID = []
+            for i in options_result:
+                miejscID.append(((i[0].split(','))[0]).replace("(",""))
+
+            print(miejscID)
+
+            options_query = '''SELECT m."ID" FROM "Gminy aktualne" m WHERE 
+                            m."nazwa" = '{}';'''.format(name)
+            options_columns, options_result = self.run_query(options_query)
+
+            for miejsc in miejscID:
+                options_query = '''CALL "zmienPrzynaleznoscMiejscowosci"({}, {}, '{}', '{}');'''.format(
+                    miejsc, (options_result[0])[0], self.userWindow.username, self.userWindow.token)
+                # self.run_call(options_query)
+                print(options_query)
 
 
     def update_results(self):
