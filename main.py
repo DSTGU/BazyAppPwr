@@ -26,6 +26,7 @@ class Application():
         self.userinfobox = None
         self.userWindow = UserWindow.UserWindow(None, None, self.postgres_connection)
         self.userWindow.loginPassup.connect(self.update_window)
+        self.userWindow.refresh.connect(self.update_results)
         self.userWindow.searchbox.textChanged.connect(self.update_results)
         self.userWindow.table_widget.cellClicked.connect(self.cell_click_action)
         # self.userWindow.loginPass.connect(self.update_login)
@@ -149,6 +150,7 @@ class Application():
         newuserWindow.show()
         self.userWindow = newuserWindow
         self.userWindow.loginPassup.connect(self.update_window)
+        self.userWindow.refresh.connect(self.update_results)
         self.userWindow.searchbox.textChanged.connect(self.update_results)
         self.userWindow.table_widget.cellClicked.connect(self.cell_click_action)
         self.admin = 1
