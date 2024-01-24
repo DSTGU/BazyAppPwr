@@ -38,7 +38,7 @@ class EditDatabaseWindow(QMainWindow):
                 self.input_layout.addRow("Polozenie Y:", self.polozenieY_miasta)
             else:
                 self.input_layout.addRow("Nazwa: ", self.populacja_miasta)
-                # self.layout_addRow()
+                self.ok_button.clicked.connect(self.edit_gmina)
 
         else:
             self.ok_button.clicked.connect(self.delete_thing)
@@ -56,6 +56,10 @@ class EditDatabaseWindow(QMainWindow):
             self.action_done.emit(self.nazwa_miasta.displayText().strip('"\''), int(self.populacja_miasta.displayText()),
                                   str(self.polozenieX_miasta.displayText()), str(self.polozenieY_miasta.displayText()))
             self.close()
+
+    def edit_gmina(self):
+        self.action_done.emit(self.nazwa_miasta.displayText().strip('"\''), int(self.populacja_miasta.displayText()), "", "")
+        self.close()
 
     def delete_thing(self):
         self.action_done.emit("1", "Usun miasto", str(3.0), str(4.0))

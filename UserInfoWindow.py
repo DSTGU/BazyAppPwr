@@ -17,6 +17,7 @@ class UserInfoWindow(QMainWindow):
         self.editWindow = None
         self.rowSelected = 0
         self.name = name
+        self.id = 0
         self.connection = connection
 
         central_widget = QWidget(self)
@@ -234,7 +235,8 @@ class UserInfoWindow(QMainWindow):
 
         self.editWindow.nazwa_miasta.setText(res[2])
         self.editWindow.populacja_miasta.setText(str(res[3]))
-        
+        self.id = res[1]
+
         self.editWindow.show()
 
         loop = QEventLoop()
@@ -243,5 +245,7 @@ class UserInfoWindow(QMainWindow):
 
     def query_edytuj_gmine(self, nazwa, populacja, gpsX, gpsY):
         print("Query edytuj gmine")
-        self.action.emit("Edytuj gmine", self.name, 0, populacja, gpsX, gpsY)
+        self.action.emit("Edytuj gmine", nazwa, self.id, populacja, gpsX, gpsY)
+        self.name = nazwa
         self.update_results()
+        self.close()
