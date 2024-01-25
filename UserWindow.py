@@ -1,3 +1,4 @@
+from ast import Delete
 import dodajPowiatyWindow
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, \
     QWidget, QLineEdit, QHeaderView, QPushButton, QFormLayout, QHBoxLayout, QLabel, QStyle
@@ -8,6 +9,7 @@ from psycopg2 import sql
 import LoginWindow
 import PostgreSQLConnection
 import dodajGmineWindow
+import DeleteConfirmWindow
 
 class UserWindow(QMainWindow):
     loginPassup = pyqtSignal(str, str)#([username, token])
@@ -31,6 +33,7 @@ class UserWindow(QMainWindow):
         self.dropdown_kraje = None
         self.dropdown_powiaty = None
         self.table_widget = None
+        self.row = 0
         self.username = username
         self.token = token
 
@@ -117,7 +120,7 @@ class UserWindow(QMainWindow):
         usunPowiatButton = QPushButton(self)
         usunPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
         powiatyHBox.addWidget(usunPowiatButton)
-        usunPowiatButton.clicked.connect(self.usunPowiat)
+        usunPowiatButton.clicked.connect(self.createUsunPowiat)
 
         edytujPowiatButton = QPushButton(self)
         edytujPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
@@ -165,16 +168,25 @@ class UserWindow(QMainWindow):
         self.dodajPowiatyWindow.show()
         self.dodajPowiatyWindow.refreshpowiaty.connect(self.dodajGmineWindowSignal)
 
-    def usunGmine(self, row):
-        name = self.table_widget.item(row, 0).text()
+    def usunGmine(self):
+        name = self.table_widget.item(self.row, 0).text()
         print("CALL \"usunGmina\"('{}','{}','{}');".format(name, self.username, self.token))
         self.run_call("CALL \"usunGmina\"('{}','{}','{}');".format(name, self.username, self.token))
         self.refresh.emit()
 
+    def createUsunPowiat(self):
+        confirmWindow = DeleteConfirmWindow.DeleteConfirmWindow("Usun powiat")
+        confirmWindow.delete.connect(self.usunPowiat)
+        confirmWindow.show()
+
+        loop = QEventLoop()
+        confirmWindow.destroyed.connect(loop.quit)
+        loop.exec()
+
     def usunPowiat(self):
         name = self.dropdown_powiaty.currentText()
         print("CALL \"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
-        self.run_call("CALL \"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
+        self.run_call("CALL public.\"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
         self.refresh.emit()
 
     def showEdytujPowiatWindow(self):

@@ -7,7 +7,7 @@ from psycopg2 import sql
 import PostgreSQLConnection
 import UserWindow
 import UserInfoWindow
-
+import DeleteConfirmWindow
 
 class Application():
 
@@ -65,8 +65,14 @@ class Application():
         if column <= 2:
             self.create_infobox(row,column)
         else:
-            self.userWindow.usunGmine(row)
+            self.userWindow.row = row
+            confirmWindow = DeleteConfirmWindow.DeleteConfirmWindow("Usun gmine")
+            confirmWindow.delete.connect(self.userWindow.usunGmine)
+            confirmWindow.show()
 
+            loop = QEventLoop()
+            confirmWindow.destroyed.connect(loop.quit)
+            loop.exec()
 
     def create_infobox(self, row, column):
 

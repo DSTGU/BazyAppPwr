@@ -6,6 +6,7 @@ import psycopg2
 from psycopg2 import sql
 
 import EditDatabaseWindow
+import DeleteConfirmWindow
 
 class UserInfoWindow(QMainWindow):
     action = pyqtSignal(str, str, int, int, str, str)# query, rest
@@ -190,15 +191,15 @@ class UserInfoWindow(QMainWindow):
         self.update_results()
 
     def usun_miasto(self):
-        self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Usun miasto")
-        self.editWindow.action_done.connect(self.query_usun_miasto)
+        self.editWindow = DeleteConfirmWindow.DeleteConfirmWindow("Usun miasto")
+        self.editWindow.delete.connect(self.query_usun_miasto)
         self.editWindow.show()
 
         loop = QEventLoop()
         self.editWindow.destroyed.connect(loop.quit)
         loop.exec()
 
-    def query_usun_miasto(self, nazwa, populacja, gpsX, gpsY):
+    def query_usun_miasto(self, nazwa):
         name = self.table_widget.item(self.rowSelected, 0).text()
 
         options_query = '''SELECT m."ID" FROM "Miejscowosci aktualne" m WHERE 
@@ -206,9 +207,7 @@ class UserInfoWindow(QMainWindow):
 
         options_columns, options_result = self.run_query(options_query)
 
-        # idM = (options_result[0])[0]
-
-        self.action.emit("Usun miasto", name, (options_result[0])[0], populacja, gpsX, gpsY)
+        self.action.emit("Usun miasto", name, (options_result[0])[0], 0, "", "")
 
         self.update_results()
 
