@@ -12,6 +12,7 @@ class DodajGmineWindow(QWidget):
         self.username = username
         self.token = token
         self.connection = connection
+        self.setWindowTitle("Dodaj gmine")
 
         self.layout = QFormLayout();
 

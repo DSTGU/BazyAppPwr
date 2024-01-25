@@ -12,7 +12,7 @@ class DodajPowiatyWindow(QWidget):
         self.username = username
         self.token = token
         self.connection = connection
-
+        self.setWindowTitle("Dodaj powiat")
         self.layout = QFormLayout();
 
         self.dropdown_kraje = QComboBox(self)

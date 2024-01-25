@@ -103,7 +103,7 @@ class UserInfoWindow(QMainWindow):
                             ")", "")))
             population += int(i[0].split(',')[2])
 
-        self.label2.setText(str(population))
+        self.label2.setText("Populacja: {}".format(population))
 
         for row_index, row in enumerate(res):
             self.table_widget.insertRow(row_index)
@@ -119,7 +119,7 @@ class UserInfoWindow(QMainWindow):
         return (columns, result)
 
     def dodaj_miasto(self):
-        # Nazwa, populacja, Po³o¿enie (point), ID_Gminy (dostaje)
+        # Nazwa, populacja, Po o enie (point), ID_Gminy (dostaje)
         self.editWindow = EditDatabaseWindow.EditDatabaseWindow("Dodaj miasto")
         self.editWindow.action_done.connect(self.query_dodaj_miasto)
         self.editWindow.show()
