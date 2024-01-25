@@ -113,34 +113,27 @@ class Application():
             options_query = '''CALL "dodajMiejscowosc"('{}', {}, {}, point({}, {}), '{}', '{}');'''.format(
                 name, (stareMiejsc[0])[4], population, gpsX, gpsY, self.userWindow.username, self.userWindow.token)
             self.run_call(options_query)
-            print(options_query)
 
             # TODO: Kody
             options_query = '''SELECT pokazkodymiejscowosci('{}', {});'''.format((stareMiejsc[0])[1], (stareMiejsc[0])[0])
             options_columns, options_result = self.run_query(options_query)
-            print(options_query)
 
             codes = []
             for i in options_result:
                 codes.append(((i[0].split(','))[0]).replace("(",""))
 
-            print(codes)
-
             options_query = '''CALL "usunMiejscowosc"({}, '{}', '{}');'''.format(
                 idIn, self.userWindow.username, self.userWindow.token)
-            self.run_call(options_query)
-            print(options_query)            
+            self.run_call(options_query) 
 
             options_query = '''SELECT m."ID" FROM "Miejscowosci aktualne" m WHERE 
                             m."nazwa" = '{}';'''.format(name)
             options_columns, options_result = self.run_query(options_query)
-            print(options_query)
 
             for code in codes:
                 options_query = '''CALL "zmienPrzynaleznoscKoduPocz"({}, {}, '{}', '{}');'''.format(
                     code, (options_result[0])[0], self.userWindow.username, self.userWindow.token)
                 self.run_call(options_query)
-                print(options_query)
 
         elif (actionType == "Edytuj gmine"):
             options_query = '''SELECT * FROM "Gminy aktualne" g WHERE 
@@ -172,7 +165,8 @@ class Application():
                 options_query = '''CALL "zmienPrzynaleznoscMiejscowosci"({}, {}, '{}', '{}');'''.format(
                     miejsc, (options_result[0])[0], self.userWindow.username, self.userWindow.token)
                 self.run_call(options_query)
-
+            
+            self.show_database()
 
     def update_results(self):
         selected_option = self.userWindow.dropdown_kraje.currentText()

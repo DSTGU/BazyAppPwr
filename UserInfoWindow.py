@@ -12,7 +12,7 @@ class UserInfoWindow(QMainWindow):
 
     def __init__(self, name, population, data, admin, connection):
         super().__init__()
-        print(name)
+
         self.setWindowTitle("Info Window")
         self.editWindow = None
         self.rowSelected = 0
@@ -94,7 +94,7 @@ class UserInfoWindow(QMainWindow):
         options_columns, options_result = self.run_query(options_query)
         res = []
         population = 0
-        #print(options_result)
+        
         for i in options_result:
             res.append((i[0].split(',')[1], i[0].split(',')[2],
                         (str(i[0].split(',')[3]) + " " + str(i[0].split(',')[4])).replace("\"", "").replace("(",
@@ -128,7 +128,6 @@ class UserInfoWindow(QMainWindow):
         loop.exec()
 
     def query_dodaj_miasto(self, nazwa, populacja, gpsX, gpsY):
-        print("query dodaj miasto")
         # Znajdz ID gminy
         options_query = '''SELECT g."id_gminy" FROM "Gminy aktualne" g WHERE 
                             g."nazwa_gminy" = '{}';'''.format(self.name)
@@ -179,7 +178,6 @@ class UserInfoWindow(QMainWindow):
         loop.exec()
 
     def query_edytuj_miasto(self, nazwa, populacja, gpsX, gpsY):
-        print("query Edytuj miasto")
         name = self.table_widget.item(self.rowSelected, 0).text()
 
         options_query = '''SELECT m."ID" FROM "Miejscowosci aktualne" m WHERE 
@@ -201,7 +199,6 @@ class UserInfoWindow(QMainWindow):
         loop.exec()
 
     def query_usun_miasto(self, nazwa, populacja, gpsX, gpsY):
-        print("query_usun")
         name = self.table_widget.item(self.rowSelected, 0).text()
 
         options_query = '''SELECT m."ID" FROM "Miejscowosci aktualne" m WHERE 
@@ -211,9 +208,7 @@ class UserInfoWindow(QMainWindow):
 
         # idM = (options_result[0])[0]
 
-        # print(idM)
         self.action.emit("Usun miasto", name, (options_result[0])[0], populacja, gpsX, gpsY)
-        # options_query = '''CALL "usunMiejscowosc"({}, );'''.format(idM)
 
         self.update_results()
 
@@ -230,8 +225,6 @@ class UserInfoWindow(QMainWindow):
         for i in options_result:
             for j in i:
                 res.append(j)
-                
-        print(res)
 
         self.editWindow.nazwa_miasta.setText(res[2])
         self.editWindow.populacja_miasta.setText(str(res[3]))
@@ -244,7 +237,6 @@ class UserInfoWindow(QMainWindow):
         loop.exec()
 
     def query_edytuj_gmine(self, nazwa, populacja, gpsX, gpsY):
-        print("Query edytuj gmine")
         self.action.emit("Edytuj gmine", nazwa, self.id, populacja, gpsX, gpsY)
         self.name = nazwa
         self.update_results()

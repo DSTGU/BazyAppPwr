@@ -21,7 +21,6 @@ class EditDatabaseWindow(QMainWindow):
         if (str(windowName) != "Usun miasto"):
             self.resize(400, 200)
             self.nazwa_miasta = QLineEdit(self)
-            self.input_layout.addRow("Nazwa miasta:", self.nazwa_miasta)
 
             self.populacja_miasta = QLineEdit(self)
             self.polozenieX_miasta = None
@@ -30,6 +29,7 @@ class EditDatabaseWindow(QMainWindow):
             if (str(windowName) != "Edytuj gmine"):
                 self.ok_button.clicked.connect(self.check_data)
 
+                self.input_layout.addRow("Nazwa miasta:", self.nazwa_miasta)
                 self.input_layout.addRow("Populacja:", self.populacja_miasta)
 
                 self.polozenieX_miasta = QLineEdit(self)
@@ -37,7 +37,8 @@ class EditDatabaseWindow(QMainWindow):
                 self.input_layout.addRow("Polozenie X:", self.polozenieX_miasta)
                 self.input_layout.addRow("Polozenie Y:", self.polozenieY_miasta)
             else:
-                self.input_layout.addRow("Nazwa: ", self.populacja_miasta)
+                self.input_layout.addRow("Nazwa gminy:", self.nazwa_miasta)
+                self.input_layout.addRow("ID Powiatu:", self.populacja_miasta)
                 self.ok_button.clicked.connect(self.edit_gmina)
 
         else:
@@ -52,7 +53,6 @@ class EditDatabaseWindow(QMainWindow):
                 and int(self.populacja_miasta.displayText()) > 0
                 # and self.polozenieX_miasta.displayText() != ""
         ):#and self.polozenieY_miasta.displayText() != ""):
-            print("dobrze")
             self.action_done.emit(self.nazwa_miasta.displayText().strip('"\''), int(self.populacja_miasta.displayText()),
                                   str(self.polozenieX_miasta.displayText()), str(self.polozenieY_miasta.displayText()))
             self.close()
