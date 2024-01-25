@@ -153,7 +153,7 @@ class Application():
             for i in options_result:
                 miejscID.append(((i[0].split(','))[0]).replace("(",""))
 
-            options_query = '''CALL "usunGmina"('{}', '{}', '{}');'''.format(
+            options_query = '''CALL "usunGminaOld"('{}', '{}', '{}');'''.format(
                 (staraGmina[0])[2], self.userWindow.username, self.userWindow.token)
             self.run_call(options_query)
 
@@ -163,7 +163,7 @@ class Application():
 
             for miejsc in miejscID:
                 options_query = '''CALL "zmienPrzynaleznoscMiejscowosci"({}, {}, '{}', '{}');'''.format(
-                    miejsc, (options_result[0])[0], self.userWindow.username, self.userWindow.token)
+                   miejsc, (options_result[0])[0], self.userWindow.username, self.userWindow.token)
                 self.run_call(options_query)
             
             self.show_database()
