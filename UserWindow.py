@@ -156,8 +156,12 @@ class UserWindow(QMainWindow):
         loop.exec()
 
     def showDodajGmineWindow(self):
-        self.dodajGmineWindow = dodajGmineWindow.DodajGmineWindow(self.connection)
+        self.dodajGmineWindow = dodajGmineWindow.DodajGmineWindow(self.connection, self.username, self.token)
         self.dodajGmineWindow.show()
+        self.dodajGmineWindow.refreshgminy.connect(self.dodajGmineWindowSignal)
+
+    def dodajGmineWindowSignal(self):
+        self.refresh.emit()
 
     def showDodajKrajWindow(self):
         print("2")
@@ -166,14 +170,14 @@ class UserWindow(QMainWindow):
 
     def usunGmine(self, row):
         name = self.table_widget.item(row, 0).text()
-        print("CALL \"usunGmina\"('{}','{}','{}')".format(name, self.username, self.token))
-        self.run_call("CALL \"usunGmina\"('{}','{}','{}')".format(name, self.username, self.token))
+        print("CALL \"usunGmina\"('{}','{}','{}');".format(name, self.username, self.token))
+        self.run_call("CALL \"usunGmina\"('{}','{}','{}');".format(name, self.username, self.token))
         self.refresh.emit()
 
     def usunPowiat(self):
         name = self.dropdown_powiaty.currentText()
-        print("CALL \"usunPowiat\"('{}','{}','{}')".format(name, self.username, self.token))
-        self.run_call("CALL \"usunPowiat\"('{}','{}','{}')".format(name, self.username, self.token))
+        print("CALL \"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
+        self.run_call("CALL \"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
         self.refresh.emit()
 
     def showEdytujPowiatWindow(self):
@@ -191,9 +195,9 @@ class UserWindow(QMainWindow):
 
     def run_query(self, query):
         select_data_query = sql.SQL(query)
-        columns, result = self.postgres_connection.execute_query(select_data_query)
+        columns, result = self.connection.execute_query(select_data_query)
         return (columns, result)
 
     def run_call(self, call):
         select_call = sql.SQL(call)
-        self.postgres_connection.execute_call(select_call)
+        self.connection.execute_call(select_call)

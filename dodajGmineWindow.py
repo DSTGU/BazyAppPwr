@@ -1,13 +1,16 @@
 from PyQt5.QtWidgets import QLineEdit, QPushButton, QWidget, QVBoxLayout, QMessageBox, QLabel, QFormLayout, \
  QComboBox, QMainWindow, QDialogButtonBox
+from PyQt5.QtCore import pyqtSignal
 
 from psycopg2 import sql
 
 class DodajGmineWindow(QWidget):
-
-    def __init__(self, connection):
+    refreshgminy = pyqtSignal()
+    def __init__(self, connection, username, token):
 
         super().__init__()
+        self.username = username
+        self.token = token
         self.connection = connection
 
         self.layout = QFormLayout();
@@ -64,7 +67,22 @@ class DodajGmineWindow(QWidget):
         columns, result = self.connection.execute_query(select_data_query)
         return (columns, result)
 
+    def run_call(self, call):
+        select_call = sql.SQL(call)
+        self.connection.execute_call(select_call)
 
     def add(self):
         kraj = self.dropdown_kraje.currentText()
         powiat = self.dropdown_powiaty.currentText()
+
+        idpowiatu = self.run_query('''SELECT *
+            FROM "Powiaty aktualne"
+            WHERE "nazwa_powiatu" = '{}' and "nazwa_kraju" = '{}';'''.format(powiat,kraj))
+        idpowiatu = idpowiatu[1][0][1]
+
+        call = '''CALL "dodajGmine"('{}',{},'{}','{}')'''.format(self.nazwaGminy.text(), idpowiatu, self.username, self.token)
+        print(call)
+        self.run_call(call)
+        self.refreshgminy.emit()
+        self.close()
+
