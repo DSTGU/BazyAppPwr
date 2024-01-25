@@ -1,3 +1,4 @@
+import dodajPowiatyWindow
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, \
     QWidget, QLineEdit, QHeaderView, QPushButton, QFormLayout, QHBoxLayout, QLabel, QStyle
 from PyQt5.QtCore import QEventLoop, pyqtSlot, pyqtSignal
@@ -22,6 +23,8 @@ class UserWindow(QMainWindow):
         self.central_layout = QVBoxLayout(self)
         self.top_layout = QFormLayout(self)
 
+        self.dodajGmineWindow = None
+        self.dodajPowiatyWindow = None
         self.loginButton = None
         self.loginWindow = None
         self.searchbox = None
@@ -90,11 +93,6 @@ class UserWindow(QMainWindow):
         krajeHBox.addWidget(self.dropdown_kraje)
         # central_layout.addWidget(self.dropdown_kraje)
 
-        dodajKrajButton = QPushButton(self)
-        dodajKrajButton.setIcon(self.style().standardIcon(QStyle.SP_DialogApplyButton))
-        krajeHBox.addWidget(dodajKrajButton)
-        dodajKrajButton.clicked.connect(self.showDodajKrajWindow)
-
         edytujKrajButton = QPushButton(self)
         edytujKrajButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
         krajeHBox.addWidget(edytujKrajButton)
@@ -155,23 +153,28 @@ class UserWindow(QMainWindow):
         loop.exec()
 
     def showDodajGmineWindow(self):
-        print("1")
-        okno = dodajGmineWindow.DodajGmineWindow()
-    def showDodajKrajWindow(self):
-        print("2")
+        self.dodajGmineWindow = dodajGmineWindow.DodajGmineWindow(self.connection, self.username, self.token)
+        self.dodajGmineWindow.show()
+        self.dodajGmineWindow.refreshgminy.connect(self.dodajGmineWindowSignal)
+
+    def dodajGmineWindowSignal(self):
+        self.refresh.emit()
+
     def showDodajPowiatWindow(self):
-        print("3")
+        self.dodajPowiatyWindow = dodajPowiatyWindow.DodajPowiatyWindow(self.connection, self.username, self.token)
+        self.dodajPowiatyWindow.show()
+        self.dodajPowiatyWindow.refreshpowiaty.connect(self.dodajGmineWindowSignal)
 
     def usunGmine(self, row):
         name = self.table_widget.item(row, 0).text()
-        print("CALL \"usunGmina\"('{}','{}','{}')".format(name, self.username, self.token))
-        self.run_query("CALL \"usunGmina\"('{}','{}','{}')".format(name, self.username, self.token))
+        print("CALL \"usunGmina\"('{}','{}','{}');".format(name, self.username, self.token))
+        self.run_call("CALL \"usunGmina\"('{}','{}','{}');".format(name, self.username, self.token))
         self.refresh.emit()
 
     def usunPowiat(self):
         name = self.dropdown_powiaty.currentText()
-        print("CALL \"usunPowiat\"('{}','{}','{}')".format(name, self.username, self.token))
-        self.run_query("CALL \"usunPowiat\"('{}','{}','{}')".format(name, self.username, self.token))
+        print("CALL \"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
+        self.run_call("CALL \"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
         self.refresh.emit()
 
     def showEdytujPowiatWindow(self):
@@ -184,8 +187,14 @@ class UserWindow(QMainWindow):
         print("Passed one")
         self.loginPassup.emit(username,token)
 
+
+
+
     def run_query(self, query):
-
         select_data_query = sql.SQL(query)
-        self.connection.execute_query(select_data_query, fetch_result=False)
+        columns, result = self.connection.execute_query(select_data_query)
+        return (columns, result)
 
+    def run_call(self, call):
+        select_call = sql.SQL(call)
+        self.connection.execute_call(select_call)

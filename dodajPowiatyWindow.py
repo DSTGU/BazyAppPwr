@@ -4,8 +4,8 @@ from PyQt5.QtCore import pyqtSignal
 
 from psycopg2 import sql
 
-class DodajGmineWindow(QWidget):
-    refreshgminy = pyqtSignal()
+class DodajPowiatyWindow(QWidget):
+    refreshpowiaty = pyqtSignal()
     def __init__(self, connection, username, token):
 
         super().__init__()
@@ -18,11 +18,8 @@ class DodajGmineWindow(QWidget):
         self.dropdown_kraje = QComboBox(self)
         self.layout.addRow("Kraj: ", self.dropdown_kraje)
 
-        self.dropdown_powiaty = QComboBox(self)
-        self.layout.addRow("Powiat: ", self.dropdown_powiaty)
-
-        self.nazwaGminy = QLineEdit(self)
-        self.layout.addRow(self.nazwaGminy)
+        self.nazwaPowiatu = QLineEdit(self)
+        self.layout.addRow(self.nazwaPowiatu)
 
         self.buttons = QDialogButtonBox(self)
         self.buttons.addButton(QDialogButtonBox.StandardButton.Ok)
@@ -34,7 +31,6 @@ class DodajGmineWindow(QWidget):
         self.layout.addRow(self.buttons)
 
         self.update_dropdown_kraje()
-        self.update_dropdown_powiaty()
 
         self.setLayout(self.layout)
 
@@ -46,20 +42,6 @@ class DodajGmineWindow(QWidget):
         options = [row[0].split(",")[1].replace("\"", "") for row in options_result]
         # Populate the dropdown list with options
         self.dropdown_kraje.addItems(options)
-
-        # Connect the dropdown's currentIndexChanged signal to a slot (e.g., update_table)
-        self.dropdown_kraje.currentIndexChanged.connect(self.update_dropdown_powiaty)
-
-    def update_dropdown_powiaty(self):
-        self.dropdown_powiaty.clear()
-        # Fetch available osptions from the database
-        selected_option = self.dropdown_kraje.currentText()
-        options_query = '''SELECT pokazpodleglepowiaty('{}')'''.format(selected_option)
-        options_columns, options_result = self.run_query(options_query)
-
-        options = [row[0].split(",")[1].replace("\"", "") for row in options_result]
-        # Populate the dropdown list with options
-        self.dropdown_powiaty.addItems(options)
 
 
     def run_query(self, query):
@@ -73,16 +55,15 @@ class DodajGmineWindow(QWidget):
 
     def add(self):
         kraj = self.dropdown_kraje.currentText()
-        powiat = self.dropdown_powiaty.currentText()
 
-        idpowiatu = self.run_query('''SELECT *
-            FROM "Powiaty aktualne"
-            WHERE "nazwa_powiatu" = '{}' and "nazwa_kraju" = '{}';'''.format(powiat,kraj))
-        idpowiatu = idpowiatu[1][0][1]
-
-        call = '''CALL "dodajGmine"('{}',{},'{}','{}')'''.format(self.nazwaGminy.text(), idpowiatu, self.username, self.token)
+        idkraju = self.run_query('''SELECT *
+            FROM "Kraje aktualne"
+            WHERE "nazwa_kraju" = '{}';'''.format(kraj))
+        idkraju = idkraju[1][0][1]
+        print(idkraju)
+        call = '''CALL "dodajPowiat"('{}',{},'{}','{}')'''.format(self.nazwaPowiatu.text(), idkraju, self.username, self.token)
         print(call)
         self.run_call(call)
-        self.refreshgminy.emit()
+        self.refreshpowiaty.emit()
         self.close()
 
