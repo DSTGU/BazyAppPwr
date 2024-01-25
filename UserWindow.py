@@ -94,13 +94,7 @@ class UserWindow(QMainWindow):
 
         self.dropdown_kraje = QComboBox(self)
         krajeHBox.addWidget(self.dropdown_kraje)
-        # central_layout.addWidget(self.dropdown_kraje)
-
-        edytujKrajButton = QPushButton(self)
-        edytujKrajButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
-        krajeHBox.addWidget(edytujKrajButton)
         self.top_layout.addRow(krajeHBox)
-        edytujKrajButton.clicked.connect(self.showEdytujKrajWindow)
 
 
         powiatyHBox = QHBoxLayout(self)
@@ -121,11 +115,6 @@ class UserWindow(QMainWindow):
         usunPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
         powiatyHBox.addWidget(usunPowiatButton)
         usunPowiatButton.clicked.connect(self.createUsunPowiat)
-
-        edytujPowiatButton = QPushButton(self)
-        edytujPowiatButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
-        powiatyHBox.addWidget(edytujPowiatButton)
-        edytujPowiatButton.clicked.connect(self.showEdytujPowiatWindow)
 
         self.top_layout.addRow(powiatyHBox)
 
@@ -188,11 +177,6 @@ class UserWindow(QMainWindow):
         print("CALL \"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
         self.run_call("CALL public.\"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
         self.refresh.emit()
-
-    def showEdytujPowiatWindow(self):
-        print("7")
-    def showEdytujKrajWindow(self):
-        print("8")
 
 
     def passup(self, username, token):
