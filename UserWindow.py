@@ -1,3 +1,4 @@
+import dodajPowiatyWindow
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, \
     QWidget, QLineEdit, QHeaderView, QPushButton, QFormLayout, QHBoxLayout, QLabel, QStyle
 from PyQt5.QtCore import QEventLoop, pyqtSlot, pyqtSignal
@@ -23,6 +24,7 @@ class UserWindow(QMainWindow):
         self.top_layout = QFormLayout(self)
 
         self.dodajGmineWindow = None
+        self.dodajPowiatyWindow = None
         self.loginButton = None
         self.loginWindow = None
         self.searchbox = None
@@ -91,11 +93,6 @@ class UserWindow(QMainWindow):
         krajeHBox.addWidget(self.dropdown_kraje)
         # central_layout.addWidget(self.dropdown_kraje)
 
-        dodajKrajButton = QPushButton(self)
-        dodajKrajButton.setIcon(self.style().standardIcon(QStyle.SP_DialogApplyButton))
-        krajeHBox.addWidget(dodajKrajButton)
-        dodajKrajButton.clicked.connect(self.showDodajKrajWindow)
-
         edytujKrajButton = QPushButton(self)
         edytujKrajButton.setIcon(self.style().standardIcon(QStyle.SP_FileDialogInfoView))
         krajeHBox.addWidget(edytujKrajButton)
@@ -163,10 +160,10 @@ class UserWindow(QMainWindow):
     def dodajGmineWindowSignal(self):
         self.refresh.emit()
 
-    def showDodajKrajWindow(self):
-        print("2")
     def showDodajPowiatWindow(self):
-        print("3")
+        self.dodajPowiatyWindow = dodajPowiatyWindow.DodajPowiatyWindow(self.connection, self.username, self.token)
+        self.dodajPowiatyWindow.show()
+        self.dodajPowiatyWindow.refreshpowiaty.connect(self.dodajGmineWindowSignal)
 
     def usunGmine(self, row):
         name = self.table_widget.item(row, 0).text()
