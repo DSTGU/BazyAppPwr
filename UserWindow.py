@@ -1,5 +1,3 @@
-from ast import Delete
-import dodajPowiatyWindow
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox, \
     QWidget, QLineEdit, QHeaderView, QPushButton, QFormLayout, QHBoxLayout, QLabel, QStyle
 from PyQt5.QtCore import QEventLoop, pyqtSlot, pyqtSignal
@@ -10,6 +8,7 @@ import LoginWindow
 import PostgreSQLConnection
 import dodajGmineWindow
 import DeleteConfirmWindow
+import dodajPowiatyWindow
 
 class UserWindow(QMainWindow):
     loginPassup = pyqtSignal(str, str)#([username, token])
@@ -159,7 +158,6 @@ class UserWindow(QMainWindow):
 
     def usunGmine(self):
         name = self.table_widget.item(self.row, 0).text()
-        print("CALL \"usunGmina\"('{}','{}','{}');".format(name, self.username, self.token))
         self.run_call("CALL \"usunGmina\"('{}','{}','{}');".format(name, self.username, self.token))
         self.refresh.emit()
 
@@ -174,17 +172,13 @@ class UserWindow(QMainWindow):
 
     def usunPowiat(self):
         name = self.dropdown_powiaty.currentText()
-        print("CALL \"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
+        
         self.run_call("CALL public.\"usunPowiat\"('{}','{}','{}');".format(name, self.username, self.token))
         self.refresh.emit()
 
 
     def passup(self, username, token):
-        print("Passed one")
         self.loginPassup.emit(username,token)
-
-
-
 
     def run_query(self, query):
         select_data_query = sql.SQL(query)

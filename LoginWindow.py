@@ -11,8 +11,9 @@ class LoginWindow(QWidget):
 
         self.username = ""
         self.password = ""
+        
+        self.setWindowTitle("Login window")
 
-        # layout = QVBoxLayout()
         layout = QFormLayout()
 
         self.usernameText = QLineEdit(self)
@@ -35,6 +36,7 @@ class LoginWindow(QWidget):
         self.setLayout(layout)
 
         self.userWindow = userWindow
+        self.resize(375, 75)
 
     @pyqtSlot()
     def on_click(self):

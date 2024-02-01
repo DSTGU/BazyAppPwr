@@ -82,7 +82,7 @@ class DodajGmineWindow(QWidget):
         idpowiatu = idpowiatu[1][0][1]
 
         call = '''CALL "dodajGmine"('{}',{},'{}','{}')'''.format(self.nazwaGminy.text(), idpowiatu, self.username, self.token)
-        print(call)
+        
         self.run_call(call)
         self.refreshgminy.emit()
         self.close()

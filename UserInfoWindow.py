@@ -25,11 +25,11 @@ class UserInfoWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         self.layout = QVBoxLayout(central_widget)
-
+        
         self.label1 = QLabel("Gmina: {}".format(name), central_widget)
         self.label1.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.label1)
-
+        
         if population is not None:
             if population != 0:
                 self.label2 = QLabel("Populacja: {}".format(population), central_widget)
@@ -60,7 +60,7 @@ class UserInfoWindow(QMainWindow):
         self.table_widget.setColumnCount(3)
         self.table_widget.setHorizontalHeaderLabels(['Miasto','Populacja', 'Polozenie'])
         self.table_widget.cellClicked.connect(self.cell_click_action)
-
+        
         for row_index, row in enumerate(data):
             self.table_widget.insertRow(row_index)
             for col_index, value in enumerate(row):
@@ -73,10 +73,10 @@ class UserInfoWindow(QMainWindow):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
-
+        
         self.setLayout(self.layout)
+        
         self.resize(450,450)
-
 
         self.show()
 

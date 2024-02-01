@@ -20,7 +20,7 @@ class DeleteConfirmWindow(QMainWindow):
         self.cancel_button.clicked.connect(self.exit_window)
         self.ok_button.clicked.connect(self.delete_thing)
             
-        self.resize(200, 100)
+        self.resize(350, 75)
         self.input_layout.addRow(self.ok_button, self.cancel_button)
 
     def delete_thing(self):

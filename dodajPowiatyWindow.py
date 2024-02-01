@@ -60,9 +60,9 @@ class DodajPowiatyWindow(QWidget):
             FROM "Kraje aktualne"
             WHERE "nazwa_kraju" = '{}';'''.format(kraj))
         idkraju = idkraju[1][0][1]
-        print(idkraju)
+
         call = '''CALL "dodajPowiat"('{}',{},'{}','{}')'''.format(self.nazwaPowiatu.text(), idkraju, self.username, self.token)
-        print(call)
+
         self.run_call(call)
         self.refreshpowiaty.emit()
         self.close()

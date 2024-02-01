@@ -12,6 +12,7 @@ import DeleteConfirmWindow
 class Application():
 
     def __init__(self):
+        # Set SQL server parameters
         f = open("local.ini", "r")
 
         self.postgres_connection = PostgreSQLConnection.PostgreSQLConnection(
@@ -29,7 +30,7 @@ class Application():
         self.userWindow.refresh.connect(self.show_database)
         self.userWindow.searchbox.textChanged.connect(self.update_results)
         self.userWindow.table_widget.cellClicked.connect(self.cell_click_action)
-        # self.userWindow.loginPass.connect(self.update_login)
+
         self.admin = 0
 
         self.show_database()
@@ -83,7 +84,7 @@ class Application():
         options_columns, options_result = self.run_query(options_query)
         res = []
         population = 0
-        #print(options_result)
+        
         for i in options_result:
             res.append((i[0].split(',')[1], i[0].split(',')[2],
                         (str(i[0].split(',')[3]) + " " + str(i[0].split(',')[4])).replace("\"", "").replace("(",
@@ -109,18 +110,18 @@ class Application():
             self.run_call(options_query)
         
         elif (actionType == "Edytuj miasto"):
-            # Zapisane stare dane
+            # Save old data
             options_query = '''SELECT * FROM "Miejscowosci aktualne" m WHERE 
                             m."ID" = {};'''.format(idIn)
 
             options_columns, stareMiejsc = self.run_query(options_query)
 
-            # Usunac, stworzyc nowe, podpiac ew kody
+            # Replace old miejscowosc by deleting and adding a new one
             options_query = '''CALL "dodajMiejscowosc"('{}', {}, {}, point({}, {}), '{}', '{}');'''.format(
                 name, (stareMiejsc[0])[4], population, gpsX, gpsY, self.userWindow.username, self.userWindow.token)
             self.run_call(options_query)
 
-            # TODO: Kody
+            # Assign back post codes
             options_query = '''SELECT pokazkodymiejscowosci('{}', {});'''.format((stareMiejsc[0])[1], (stareMiejsc[0])[0])
             options_columns, options_result = self.run_query(options_query)
 
@@ -142,12 +143,13 @@ class Application():
                 self.run_call(options_query)
 
         elif (actionType == "Edytuj gmine"):
+            # Save old data
             options_query = '''SELECT * FROM "Gminy aktualne" g WHERE 
                             g."id_gminy" = '{}';'''.format(idIn)
 
             options_columns, staraGmina = self.run_query(options_query)
             
-            # Usunac, stworzyc nowe, podpiac miejscowosci
+            # Replace old gmina by deleting and adding a new one
             options_query = '''CALL "dodajGmine"('{}', {}, '{}', '{}');'''.format(
                 name, (staraGmina[0])[3], self.userWindow.username, self.userWindow.token)
             self.run_call(options_query)
@@ -167,6 +169,7 @@ class Application():
                             m."nazwa_gminy" = '{}';'''.format(name)
             options_columns, options_result = self.run_query(options_query)
 
+            # Assign miejscowosc' back
             for miejsc in miejscID:
                 options_query = '''CALL "zmienPrzynaleznoscMiejscowosci"({}, {}, '{}', '{}');'''.format(
                    miejsc, (options_result[0])[0], self.userWindow.username, self.userWindow.token)
@@ -181,6 +184,8 @@ class Application():
 
         self.userWindow.table_widget.clear()
         self.userWindow.table_widget.setRowCount(0)
+        
+        # Different action based on permissions
         if (self.admin == 0):
             self.userWindow.table_widget.setColumnCount(len(self.columns))
             self.userWindow.table_widget.setHorizontalHeaderLabels(self.columns)
@@ -234,8 +239,6 @@ class Application():
         self.userWindow.dropdown_powiaty.currentIndexChanged.connect(self.update_results)
 
     def update_window(self, username, token):
-
-
         self.userWindow.close()
         newuserWindow = UserWindow.UserWindow(username, token, self.postgres_connection)
         newuserWindow.show()
@@ -252,6 +255,7 @@ def limit_results(list):
     return [list[2], list[4], list[6]]
 
 
+# Responsible for not repeating fetching 
 def retain_results(data, kraj, powiat, nazwa):
     if (kraj != "No filter"):
         ndata = []
